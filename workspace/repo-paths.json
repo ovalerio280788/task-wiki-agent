@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "description": "Committed default repo path map. Keep values empty in git; set real values in workspace/repo-paths.local.json on each machine.",
+  "repos": {
+    "backend": "",
+    "mobile": "",
+    "automation": "",
+    "web_ui_tests": "",
+    "config_sync": ""
+  }
+}

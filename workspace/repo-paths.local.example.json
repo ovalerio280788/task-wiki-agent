@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "repos": {
+    "backend": "/Users/ovalerio/workspace/be_instawork/instawork",
+    "mobile": "/Users/ovalerio/workspace/mb_instawork/mobile",
+    "automation": "/Users/ovalerio/workspace/iw-mobile-automation-appium-wio-pytest-appium-poc",
+    "web_ui_tests": "/Users/ovalerio/workspace/web-ui-tests",
+    "config_sync": "/Users/ovalerio/workspace/config-sync"
+  }
+}
