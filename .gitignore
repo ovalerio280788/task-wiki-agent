@@ -1,1 +1,5 @@
 workspace/repo-paths.local.json
+airflow/
+config-sync/
+instawork/
+mobile/

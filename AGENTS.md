@@ -1,121 +1,73 @@
-# AGENTS.md
+# Workspace agent guide
 
-## Purpose
+## Required preflight
 
-Use this repository as Oscar's AI operating manual across multiple codebases.
-This repo provides routing, preferences, and reusable workflows.
-Canonical implementation rules stay in each target repository.
+Every task, every session, no exceptions:
 
-## File Size Budget
+1. Read `wiki/preferences/global.md`.
+2. Read `wiki/index.md`.
+3. Read the top of `wiki/log.md`.
+4. Read the wiki pages from the index that match the task.
+5. If the task touches code, repo ownership, or cross-repo behavior, read `WOKRSPACE-CATALOG.md`.
 
-`AGENTS.md` is a router, not a handbook.
+Do not reply, plan, edit, run commands, or work on the task until this preflight is complete. The
+only allowed earlier action is reading the files above.
 
-- Target size: 80-120 lines.
-- Hard limit: 150 lines.
-- When adding guidance that may increase size, move details to `playbooks/`, `task-templates/`, or `workspace/` and add only a pointer here.
-- Prefer replacing or tightening existing lines over appending new sections.
+If blocked, check the relevant wiki pages before escalating. If the wiki has nothing useful, say so
+briefly and continue with the best available evidence.
 
-## Required Read Order
+A tool or integration failure is itself a trigger to return to the wiki, not only a start-of-task
+step. When a capability returns an auth or access error, make the wiki the first stop: look for a
+documented fallback before improvising another path or reporting the capability as unavailable. For
+recurring external integrations a working fallback is usually already written down.
 
-1. `profile/guardrails.md`
-2. `workspace/repo-paths.local.json` if present, otherwise `workspace/repo-paths.json`
-3. `workspace/repos.md` when available
-4. Relevant file under `playbooks/` or `task-templates/` for the task
-5. `context/` file only if it is fresh
+## Memory boundaries
 
-If a required file is missing, proceed conservatively and call out the missing context.
-If repo path values are empty, report the missing mapping instead of guessing paths.
+This workspace is a folder of independent repos. Keep its living memory split by purpose:
 
-## Task Routing
+- `WOKRSPACE-CATALOG.md`: where code, ownership, repo responsibility, or cross-repo handoffs live.
+- `wiki/`: reusable operational learnings, workflows, gotchas, and discovered ways of working.
+  Wiki entries are process-oriented: how to run things, recipes, shortcuts, gotchas, preferences.
+  Never put business logic, domain model details, or feature behavior here — those live in the repos.
+- `wiki/preferences/`: durable user-stated behavior preferences.
 
-- Backend API or Django work
-  - Use repo mapped as backend in `workspace/repo-paths.local.json` or `workspace/repo-paths.json`
-  - Follow canonical rules in that repo
-- Mobile app or React Native work
-  - Use repo mapped as mobile in `workspace/repo-paths.local.json` or `workspace/repo-paths.json`
-  - Follow canonical rules in that repo
-- Mobile automation, Appium, or WebDriverIO work
-  - Use automation repo mapped in `workspace/repo-paths.local.json` or `workspace/repo-paths.json`
-  - Follow canonical rules in that repo
-- Web UI tests
-  - Use web test repo mapped in `workspace/repo-paths.local.json` or `workspace/repo-paths.json`
-  - Follow canonical rules in that repo
-- Config synchronization or tooling setup
-  - Use config repo mapped in `workspace/repo-paths.local.json` or `workspace/repo-paths.json`
-  - Follow canonical rules in that repo
+Never mix these. Repo routing belongs in the catalog, reusable how-to knowledge belongs in the wiki,
+and user behavior preferences belong in preferences.
 
-## Repo Path Config
+## Self-sustaining memory
 
-- Committed default path map: `workspace/repo-paths.json`
-- Local override path map: `workspace/repo-paths.local.json` (gitignored)
-- Starter example: `workspace/repo-paths.local.example.json`
+Maintain the memory without being asked. This is a standing duty, not something the user has to
+request.
 
-## Cloud vs Local Behavior
+Reflex before every reply: pause and ask "did this work surface anything durable worth
+persisting?" If yes, capture it as part of the same response, before replying. If no, move on
+silently. Do not announce the check when nothing qualifies, and never let it bloat a trivial
+answer.
 
-- Unattended cloud agent
-  - Start from this file and keep assumptions explicit
-  - Prefer small, reversible changes
-  - Report blockers with concrete evidence
-- Local attended session
-  - Keep updates short and action-focused
-  - Ask for direction only when a real decision is required
+What to capture:
 
-## Guardrails
+- Reusable, non-obvious learnings, when not already documented.
+- Durable user-stated preferences that apply beyond the current task.
 
-- Never store or expose secrets, tokens, or `.env` values in this repo.
-- Never run destructive actions without explicit user request.
-- Do not edit unrelated files.
-- Do not commit or push unless explicitly asked.
-- Prefer existing patterns over new abstractions.
-- Validate changes before claiming completion.
+Persist the learning, not the symptom. The keeper is the transferable thing: the method, the
+recognition pattern, the recipe, the gotcha that will recur. The incident that surfaced it is not.
+Before writing, strip point-in-time facts (specific values, ids, timestamps, one-off fix
+proposals) and keep only what speeds up the next similar task. If after stripping nothing general
+remains, there is nothing to persist.
 
-## Freshness Policy
+How to capture:
 
-- Treat `context/*` as valid only if recently updated.
-- If context appears stale, state assumptions and proceed with safe defaults.
-- Record uncertainty explicitly instead of guessing.
+- Update existing pages instead of creating duplicates.
+- Keep entries short, searchable, and action-oriented.
+- Never capture secrets, credentials, or one-off trivia.
 
-## Memory Update Required
+Before creating or editing wiki or preference pages, read `wiki/SCHEMA.md` and follow it.
 
-Before marking any task complete, append concise updates:
+## Catalog updates
 
-- `memory/gotchas.md` for failures, flakes, and recurring fixes
-- `memory/lessons-learned.md` for reusable patterns
-- `context/2026-06-current-focus.md` for short daily status updates
-- `decisions/YYYY-MM-DD-topic.md` only when a durable process or architecture decision is made
+Update `WOKRSPACE-CATALOG.md` only for structural routing changes:
 
-Entry format should stay short:
+- A repo purpose, responsibility, or ownership entry is wrong or missing.
+- A cross-repo handoff is discovered and not documented.
 
-- Date
-- Repo key
-- Task type
-- Issue or goal
-- Action taken
-- Result
-- Reuse note
-
-## Memory Dedup Rule
-
-Before writing to `memory/*`, check for an existing related entry.
-
-- If the existing entry already covers the same point with no new value, skip writing.
-- If the topic is the same but the new version is clearer or more useful, improve the existing entry.
-- Add a new entry only when there is materially new context, root cause, or fix.
-- Prefer fewer high-quality entries over many similar notes.
-
-## Response Expectations
-
-- Be concise and direct.
-- Include what changed, why, and how it was validated.
-- If validation is blocked, include exact blocker and next command to run.
-
-## Invocation Style
-
-- If a user message starts with `Oscar,`, treat it as a direct execution request.
-- Do not ask unnecessary confirmation questions when scope is clear.
-- If scope is ambiguous or risky, ask one concise clarifying question before proceeding.
-
-## Source of Truth Rule
-
-This repo defines Oscar-specific operating guidance.
-Target repositories remain the source of truth for implementation details, test rules, and code conventions.
+Keep catalog edits surgical. Do not put commands, runbooks, gotchas, or user preferences there.
