@@ -1,6 +1,6 @@
 ---
 title: CircleCI API — fetching job failure logs
-updated: 2026-06-20
+updated: 2026-08-20
 tags: [tooling, ci, capability, command, gotcha]
 area: tooling
 ---
@@ -21,7 +21,7 @@ CircleCI has two separate API surfaces with a hard boundary:
 Step 1 — get build details including `output_url` per step:
 
 ```bash
-export CIRCLECI_API_TOKEN=$(grep '^export CIRCLECI_API_TOKEN=' ~/.zprofile | sed 's/^export CIRCLECI_API_TOKEN="\(.*\)"$/\1/')
+export CIRCLECI_API_TOKEN=$(grep -E '^export CIRCLECI_(API_)?TOKEN=' ~/.zprofile | head -1 | sed 's/^[^=]*="\{0,1\}\([^"]*\)"\{0,1\}$/\1/')
 
 curl -sS \
   -H "Circle-Token: $CIRCLECI_API_TOKEN" \
@@ -50,7 +50,7 @@ for entry in json.load(sys.stdin):
 One-liner to dump all step output for a failing job:
 
 ```bash
-export CIRCLECI_API_TOKEN=$(grep '^export CIRCLECI_API_TOKEN=' ~/.zprofile | sed 's/^export CIRCLECI_API_TOKEN="\(.*\)"$/\1/')
+export CIRCLECI_API_TOKEN=$(grep -E '^export CIRCLECI_(API_)?TOKEN=' ~/.zprofile | head -1 | sed 's/^[^=]*="\{0,1\}\([^"]*\)"\{0,1\}$/\1/')
 JOB_NUM=12208  # the job number from /v2/workflow/{wf_id}/job
 REPO=serverless
 
@@ -88,7 +88,7 @@ PYEOF
 ## Recommended flow: pipeline → workflow → job → logs
 
 ```bash
-export CIRCLECI_API_TOKEN=$(grep '^export CIRCLECI_API_TOKEN=' ~/.zprofile | sed 's/^export CIRCLECI_API_TOKEN="\(.*\)"$/\1/')
+export CIRCLECI_API_TOKEN=$(grep -E '^export CIRCLECI_(API_)?TOKEN=' ~/.zprofile | head -1 | sed 's/^[^=]*="\{0,1\}\([^"]*\)"\{0,1\}$/\1/')
 
 # 1. List recent pipelines for a branch
 curl -sS "https://circleci.com/api/v2/project/gh/Instawork/<repo>/pipeline?branch=<branch>" \

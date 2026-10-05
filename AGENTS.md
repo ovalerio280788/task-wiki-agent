@@ -71,3 +71,19 @@ Update `WOKRSPACE-CATALOG.md` only for structural routing changes:
 - A cross-repo handoff is discovered and not documented.
 
 Keep catalog edits surgical. Do not put commands, runbooks, gotchas, or user preferences there.
+
+## Prioritization
+
+When asked to prioritize initiatives, use RICE unless the user requests a different framework:
+
+- **Reach:** number of affected people or events in a stated time period. For internal work, define
+  a consistent opportunity unit explicitly.
+- **Impact:** magnitude of the expected outcome.
+- **Confidence:** certainty in the reach and impact estimates.
+- **Effort:** person-time required.
+
+Calculate `Reach × Impact × Confidence ÷ Effort`. State the assumptions, period, scale, and
+uncertainty behind each score. Do not invent estimates; mark unknown inputs and request or derive
+evidence before presenting a ranking. Use one Reach unit and time period across compared work.
+Default scales: Impact = 3, 2, 1, 0.5, or 0.25; Confidence = 100%, 80%, or 50%. Keep the output
+short: a decision, a compact RICE table, and explicit dependency-driven exceptions.

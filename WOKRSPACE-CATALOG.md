@@ -19,6 +19,7 @@ Pick the single primary repo for the task. Disambiguations for the test and infr
 | Web browser e2e (Playwright, TypeScript) | `instawork` (`e2e/web/`) |
 | Native app shell: React Native client code, navigation, native iOS/Android, Fastlane release | `mobile` |
 | Mobile e2e test cases: `.feature` files, page objects, `test_data.json`, locators | `mobile` (`*/test/automation/`) |
+| Hyperview core library, XML renderer behavior, and Hyperview demo app/server | `hyperview` |
 | Mobile test engine itself: `instatest` CLI, Appium/Behave plumbing, parallel runner, reporting | `test-automation` |
 | AI-assisted QA tooling: TestRail as code, API v2 data generation, Allure failure AI review | `ai-manual-tester` |
 | QA/testing theory, ISTQB definitions, test design technique reference | `istqb-knownledge` |
@@ -86,6 +87,13 @@ Rule of thumb: if a screen's content, layout, or copy is wrong, suspect `instawo
 - Tech: React Native 0.77, TypeScript, Redux, CocoaPods/Android, Yarn 4, Fastlane; automation in Python, Behave, Appium, BrowserStack, Allure.
 - When to look here: the native client shell, navigation, native modules/device concerns, native build/release issues, screens still implemented purely in React Native, and the mobile e2e suite content (`.feature` files, page objects, Instatest runs). NOT for server-driven screen UI/templates/copy/layout (that is `instawork` `apps/mobile/`), NOT the backend logic/APIs (`instawork`), NOT the web Playwright suite (`instawork/e2e/web`), NOT the Instatest framework source (`test-automation`).
 - Cross-repo: renders mobile UI served by the `instawork` backend (`apps/mobile/` server-rendered templates/MDS components via `IW_DOMAIN`/`INSTAWORK_URL_OVERRIDE`, e.g. webviews and `/mobile/storybook`), so the app is largely backend driven for screens, not just data. Depends on `test-automation` directly via `requirements_qa.in` (`-e git+ssh://...test-automation.git@master#egg=instatest`); a vendored copy sits at `src/instatest/`. Talks to the `instawork` backend at `localhost:8080` via `/automation/api/v2` (`.env.example`, `shared_qa_utils/apiv2/api_client.py`). Its automation images and requirements are pulled by `docker-custom-images` (`instawork-qa-automation`). Mobile e2e is triggered by `serverless` deploybot.
+
+### hyperview
+- Purpose: shared `hyperview` React Native client library for rendering Hyperview XML (`HXML`), plus a demo XML server and demo mobile app used to validate Hyperview behavior.
+- Business role: powers server-driven mobile UI rendering patterns and component behaviors consumed by apps that embed Hyperview.
+- Tech: TypeScript, React Native, Jest, ESLint, XML schema validation (`schema/hyperview.xsd`), Yarn scripts for `sync`, demo `server`, and demo app runs.
+- When to look here: Hyperview XML rendering issues, core Hyperview components/behaviors, XML parser or schema compatibility, and demo app/server behavior. NOT for Instawork marketplace business logic (`instawork`) or app-specific native shell issues (`mobile`).
+- Cross-repo: published as the `hyperview` package and consumed by `mobile` (`applicant-app` dependency); can be validated through the repo's own demo server and demo app flow.
 
 ### test-automation
 - Purpose: the `instatest` framework, a standalone pip-installable BDD mobile test runner (Behave + Appium). Provides the `instatest run` CLI, parallel execution, driver/device management (local, BrowserStack, Sauce Labs), Allure/JUnit reporting, and page-object abstractions. It is the engine, not a test suite.

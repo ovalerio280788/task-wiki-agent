@@ -1,6 +1,6 @@
 ---
 title: mobile — vendored instatest framework
-updated: 2026-06-23
+updated: 2026-09-11
 tags: [mobile, testing, tooling]
 area: repos/mobile
 ---
@@ -19,6 +19,12 @@ as `instatest.*`. Two consequences trip people up.
   default. A search for a symbol can wrongly look absent. Re-run with `--no-ignore`
   (e.g. `rg -n --no-ignore "<symbol>" src/instatest/instatest`) before concluding
   something is unused.
+- **The instawork tree has its own copy, at `instawork/lib/instatest/instatest/`** (also
+  git-ignored). `e2e/mobile/lib/instatest/` is an *empty* mount point that the compose file
+  fills from `../../lib/instatest`, so searching inside `e2e/mobile` for framework source
+  returns nothing and makes the framework look unavailable locally. Read decorator, selector,
+  driver-context, and component base source from `instawork/lib/instatest` instead of inferring
+  behavior from call sites. A whole-disk `find` for it costs minutes; go straight to that path.
 - Framework-level behavior (Appium drivers, scrolling primitives, selectors, parallel
   runner, reporting) lives here, not in the test suite. Changing it is a
   `test-automation` change, not a mobile-suite change, so it usually does not belong in

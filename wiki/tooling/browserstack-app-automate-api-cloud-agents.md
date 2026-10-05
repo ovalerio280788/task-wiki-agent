@@ -1,6 +1,6 @@
 ---
 title: BrowserStack App Automate API on cloud agents
-updated: 2026-06-20
+updated: 2026-09-29
 tags: [tooling, mobile, capability, gotcha, command]
 area: tooling
 ---
@@ -21,12 +21,12 @@ Common Instawork App Automate build name prefixes: `applicant-automation`,
 
 ## What works
 
-Load credentials before any call. Cloud agent shells are non-login and do not source `~/.zprofile`:
-
-```bash
-export BROWSERSTACK_USERNAME=$(grep '^export BROWSERSTACK_USERNAME=' ~/.zprofile | sed 's/^export BROWSERSTACK_USERNAME="\(.*\)"$/\1/')
-export BROWSERSTACK_ACCESS_KEY=$(grep '^export BROWSERSTACK_ACCESS_KEY=' ~/.zprofile | sed 's/^export BROWSERSTACK_ACCESS_KEY="\(.*\)"$/\1/')
-```
+Load credentials before any call. Cloud agent shells are non-login and do not source `~/.zprofile`.
+The file can hold two access keys: a plain `BROWSERSTACK_ACCESS_KEY=` assignment and a later
+`export BROWSERSTACK_ACCESS_KEY=`. The export line can be stale and return 401 while the plain
+assignment returns 200. The username is often a plain assignment too, with no `export` prefix
+and no quotes. Parse the first plain assignment of each name, then confirm with `plan.json`
+before fetching a session.
 
 Preflight — plan and parallel usage (`GET /app-automate/plan.json`):
 
@@ -68,6 +68,13 @@ returned 200.
 Session detail: `GET /app-automate/sessions/{session_id}.json`. Per-session logs:
 `/builds/{build_id}/sessions/{session_id}/{logs|appiumlogs|devicelogs|networklogs|crashlogs}`.
 Failure triage workflow: [browserstack-failure-triage](browserstack-failure-triage.md).
+
+**No page-source endpoint.** BrowserStack does not store or expose the accessibility tree /
+`getPageSource` XML after the session ends. The only API surfaces are session metadata plus
+logs/video/screenshots. Appium logs include a page-source body **only if the test actually
+called** `GET .../source` during the run; findElement failures alone do not dump the hierarchy.
+For DOM on failure, enable instatest's page-source Allure dump
+([mobile-vendored-instatest](../repos/mobile-vendored-instatest.md)) or capture live via Appium.
 
 ## Gotchas
 

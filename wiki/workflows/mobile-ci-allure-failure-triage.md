@@ -1,6 +1,6 @@
 ---
 title: Triaging mobile CI failures from CircleCI Allure artifacts
-updated: 2026-06-30
+updated: 2026-09-11
 tags: [testing, mobile, ci, runbook, capability]
 area: workflows
 ---
@@ -54,6 +54,18 @@ each subagent's input small and avoids 15 subagents all re-parsing the same mult
   test can be a specific pinned mobile build while the feature files come from the job's own repo
   checkout at its current commit. Read the feature files at that exact commit, not at whatever
   branch you assume.
+- **The backend can be a third, independently stale version.** The scenario log line
+  `Setting instawork URL override via launch args: https://demo-<pr>.instawork.com` names a
+  per-PR demo env, so server-rendered (Hyperview/Django) markup comes from *that PR's head
+  commit*, not master or the e2e checkout. When a locator id lives in a backend template, an
+  id-based lookup fails wholesale if the demo branch predates the commit that added the id.
+  Confirm with `git merge-base --is-ancestor <id-commit> <served-sha>`. Recognition pattern:
+  every scenario touching the widget fails on every retry, the screenshot shows the control
+  rendered, and a *sibling exact-id lookup on the same screen in the same second succeeds* —
+  that rules out a driver/attribute-wide break and points at one missing template id.
+- **The health-check attachment only compares scenario start vs failure**, so "same SHA ✅" says
+  nothing about whether the served backend is current. Take the SHA from it and check ancestry
+  yourself.
 
 ## Related
 

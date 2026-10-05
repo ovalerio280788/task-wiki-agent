@@ -1,6 +1,6 @@
 ---
 title: RN upgrade locator-defect signature in forensic test triage
-updated: 2026-06-30
+updated: 2026-08-13
 note: also documents the counter-signature pointing to a genuine product defect, and live page_source triage when available
 tags: [testing, mobile, gotcha]
 area: tooling
@@ -46,6 +46,14 @@ product claim.
   corroborate a "right element, wrong locator" story; lean toward genuine app/navigation
   breakage instead, especially when the scenario involves background/deep-link/post-login
   navigation resume (exactly the kind of flow an RN navigation upgrade can break for real).
+- Distinguish "blank screen" from "blank body under a correctly rendered chrome". When the title
+  bar, search field and any carried-over state (e.g. the term the user selected) all render, the
+  navigation and the server round trip both succeeded, so the client build is exonerated for that
+  step and the empty area is a zero-result response. Before blaming the app, check whether the
+  server-driven list was given an empty-state slot: list components commonly omit it, so zero
+  results legitimately paint nothing. Also check whether the content that *did* render is
+  hardcoded seed/default data in the view — seeing a populated picker or suggestion list is then
+  no evidence at all that the underlying search index holds data in that environment.
 - Watch for false-pass checkpoint steps: a generic "the X screen should be loaded" step that only
   instantiates a page-object reference (no element/text assertion) can pass even when the screen
   is blank. If the immediately preceding "loaded" step is implemented this way, don't treat its

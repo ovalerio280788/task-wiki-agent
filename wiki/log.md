@@ -5,6 +5,1512 @@
 > When adding an entry, insert it directly below this header, above the previous newest entry.
 > Rotate when this file exceeds ~500 entries or at year end: rename to `log-YYYY.md` and start fresh.
 
+## [2026-10-05] create | workflows/browserstack-release-feature-testing.md
+- Release feature cases go under the project's Release Feature Testing folder, one case per note, links in preconditions. Create response often omits the TC id.
+
+## [2026-10-05] update | tooling/browserstack-test-management-api.md
+- Cross-link the release feature-testing workflow.
+
+## [2026-10-02] create | repos/instawork-instatest-unit-tests.md
+- `lib/instatest` pytest files run inside the `automation` compose service with `-w /workspace/lib/instatest`. No CI job runs them; failures may pre-date the branch.
+
+## [2026-10-01] create | repos/hyperview-tab-replace-dismisses-welcome.md
+- Tab REPLACE must navigate the root `tabs-route`. `setParams` hits the focused welcome sibling. My shifts is `money-route`.
+
+## [2026-10-01] update | tooling/appium-mcp-browserstack-device-session.md
+- Token login deep links are internal only: automation API worker tokens and the admin Mobile login link. Not a pro path.
+
+## [2026-10-01] update | tooling/appium-mcp-browserstack-device-session.md
+- Missing tab bar is the login deep link only. An already open session keeps the tab focused, so the same link does not rewrite the welcome modal.
+
+## [2026-10-01] update | tooling/appium-mcp-browserstack-device-session.md
+- Welcome GET records the feature view before paint. A fast deep link can skip Congrats and still leave My shifts with no tab bar.
+
+## [2026-10-01] update | tooling/appium-mcp-browserstack-device-session.md
+- Fresh-worker deep link: mark `worker_welcome_popup` viewed before login. Closing Congrats after My shifts replaces it does not restore the tab bar.
+
+## [2026-10-01] update | workflows/mobile-android-resource-id-locator-fix.md
+- `@elements(id=)` counts both the touchable and its label when they share an id. A text-only xpath count then doubles.
+
+## [2026-09-30] update | workflows/ruff-noqa-cleanup-pipeline.md
+- Reproduce `lint-e2e` with the `ruff==` pin in `e2e/mobile/requirements_qa.txt`. PATH ruff can be newer and flag rules that job does not run.
+
+## [2026-09-30] update | repos/mobile-automation-waits.md
+- No wait-until-not-stale exists; staleness is one-way. Re-locate via selector-based waits instead.
+
+## [2026-09-30] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- Applicant `@smoke` is gigs, login, navigation, and profile. Hiring, MDS viewer, and most messages are outside it.
+
+## [2026-09-29] update | tooling/browserstack-app-automate-api-cloud-agents.md
+- `~/.zprofile` can hold two access keys. The `export` line can 401; the plain assignment is the one that authenticates. Confirm with `plan.json`.
+
+## [2026-09-29] create | tooling/appium-webview-context-chromedriver.md
+- A listed WEBVIEW context still fails `switch_to.context` when no Chromedriver matches that WebView's Chrome. Click the native node if the hierarchy already exposes it.
+
+## [2026-09-29] update | workflows/mobile-android-login-local.md
+- `NoneType` on `implicitly_wait` means the Appium session never started. Read the `WebDriverException` above it; usual cause is host `adb install` past `androidInstallTimeout`.
+
+## [2026-09-29] update | workflows/mobile-ios-localhost-automation-build.md
+- Business app variant of the xcodebuild recipe. Stale node_modules/Pods and missing RN core prebuilt tarballs break the build; script-phase failures hide from `error:` greps.
+
+## [2026-09-29] update | workflows/mobile-android-resource-id-locator-fix.md
+- `{id}/text-input` is the editable test id on iOS and Android. One `@element(id=)` covers both.
+
+## [2026-09-29] update | workflows/mobile-android-resource-id-locator-fix.md
+- Native Android select-dialog rows share `android:id/text1`. Scroll `select_dialog_listview` to the row text.
+
+## [2026-09-29] update | workflows/web-ui-smoke-failure-triage.md
+- Rerunning an old master deploy fails shallow checkout once master moves past the pipeline SHA.
+
+## [2026-09-29] create | workflows/web-ui-smoke-failure-triage.md
+- Master web-ui-smoke includes `@p1 @flaky`; skip-tags omit flaky. Prefer tests API + test-results.zip.
+
+## [2026-09-29] update | workflows/mobile-android-resource-id-locator-fix.md
+- Hyperview autocomplete `setText` misses the wrapper. The EditText resource-id is `{id}/text-input`.
+
+## [2026-09-29] update | workflows/qa-platform-quarter-close-out.md
+- A parent card's subtask badge is direct children. Leaf percent diverges when a direct child has children. Name the denominator.
+
+## [2026-09-29] update | tooling/granola-mcp-bulk-export.md
+- `list_meetings` rejects `time_range: custom`. Use `this_week`, `last_week`, or `last_30_days`, then `query_granola_meetings` or `get_meetings`.
+
+## [2026-09-29] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- `@ios` selects a mobile scenario for Android and iOS. No `@ios` means Android only. There is no `@android` tag.
+
+## [2026-09-28] update | repos/mobile-step-definition-conventions.md
+- A deleted Behave step can leave the screen locator. Prove it with a name search plus `git log -S` on the public method, and check `getattr(screen, ...)` cannot build that name. Unused-step scans do not see it.
+
+## [2026-09-28] update | tooling/hyperview-button-enabled-attribute.md
+- One `button()` with `state=` is enough when a child behavior is already on that call.
+  `is_enabled()` on the id node follows it on current Android and iOS. An empty press
+  behavior only withholds the action from clients that never get `disabled`.
+
+## [2026-09-28] update | tooling/hyperview-button-enabled-attribute.md
+- `button()` always renders children. A `state=` ternary only drops the button's own
+  action/href/verb/target on older clients. Child press behaviors stay live.
+
+## [2026-09-27] update | workflows/qa-platform-sprint-kickoff.md
+- Mid-sprint, middle of the sprint, and the mid-sprint Monday are week two. Do not ask the mode when the user already said that.
+
+## [2026-09-25] update | tooling/hyperview-button-enabled-attribute.md
+- A press behavior with no action defaults to `push`, but a missing href becomes `#`, which
+  is rewritten to a navigate with an empty route id and then skipped. It does not throw.
+  `action="close"` would dismiss the screen if that press runs.
+
+## [2026-09-25] update | tooling/hyperview-button-enabled-attribute.md
+- iOS `is_enabled()` is true for an enabled touchable MDS button. The disabled touchable
+  still needs its own iOS assertion; an older page source showed `enabled="true"`.
+
+## [2026-09-25] update | workflows/mobile-android-resource-id-locator-fix.md
+- Nested-wrapper enabled xpath still is not a migration. `clickable` is only the signal when
+  the button is not a touchable; native `enabled` is documented on the new tooling page.
+
+## [2026-09-25] create | tooling/hyperview-button-enabled-attribute.md
+- Native `enabled` requires a touchable (`href`, `action`, or child behavior) plus
+  `disabled="true"` (Hyperview >= 0.110). Assert the id node. A behavior with no action
+  defaults to `push`.
+
+## [2026-09-25] update | workflows/xpath-to-id-app-target-resolution.md
+- MDS `{id}-disabled` is only the hidden twin of an enabled button with a behavior. A
+  `state=disabled` button keeps the base id; Android `enabled` stays true, `clickable` is the
+  signal. A 32-char hex resource-id is `@auto_id()` (state is hashed, children are not).
+
+## [2026-09-25] update | workflows/mobile-android-resource-id-locator-fix.md
+- Structural "nested clickable wrapper" xpath for Hyperview button enabled state dies on RN view
+  flattening; screenshot shows enabled, xpath says disabled. Not migration; `clickable` is the signal.
+
+## [2026-09-25] update | workflows/mobile-android-resource-id-locator-fix.md
+- Id-less text child under an id'd card: IdSelector parent + scoped TextSelector via
+  find_child_element replaces the content-desc descendant xpath; comma-joined content-desc is
+  RN's derived label, not the id.
+
+## [2026-09-25] update | tooling/asana-api-cloud-agents.md
+- Board custom fields rejected on subtask create; create, addProject, then PUT custom_fields.
+
+## [2026-09-25] update | workflows/mobile-android-resource-id-locator-fix.md
+- Migrated selector API lives only on the migration integration branch; a locator fix using it
+  cannot target master (import-time TypeError across the whole suite). Base the PR accordingly.
+
+## [2026-09-25] update | workflows/mobile-android-resource-id-locator-fix.md
+- After a locator fix, a later wait for permission copy is not this migration if the dump is
+  already the in-app camera capture control.
+
+## [2026-09-24] update | preferences/global.md
+- Programmatic mobile id lookups use `IdSelector`, not `Selector.by_id`. `@element(id=)` stays for
+  static locators.
+
+## [2026-09-24] update | repos/mobile-step-definition-conventions.md
+- Anchored id regex example constructs `IdSelector` directly.
+
+## [2026-09-24] update | workflows/mobile-android-resource-id-locator-fix.md
+- Report step/verdict can be stale after a merged locator PR; classify from the live run, and treat
+  a later failing step as its own classification.
+
+## [2026-09-24] update | workflows/mobile-android-resource-id-locator-fix.md
+- `-f` is a single path; a second `-f` overwrites the first.
+
+## [2026-09-24] update | workflows/mobile-android-resource-id-locator-fix.md
+- Old `Selector.by_id` was accessibility-id, so a previously passing `id=` constant is proof the
+  token sits on content-desc; classify without a dump.
+
+## [2026-09-24] update | workflows/mobile-android-resource-id-locator-fix.md
+- Skill lives in the wiki workspace `.cursor/skills`, not in instawork.
+
+## [2026-09-24] create | workflows/mobile-android-resource-id-locator-fix.md
+- One-scenario local Android loop: vscode compose path, classify resource-id miss, fix like 47197, re-run once.
+
+## [2026-09-23] update | tooling/ios-native-tabbar-liquid-glass-locators.md
+- Name union is existing `AppleSelector`/`RegexSelector` Matches; `AND type` is the only gap.
+
+## [2026-09-23] create | tooling/ios-native-tabbar-liquid-glass-locators.md
+- Native vs Hyperview tab trees: Button + title-case `name` vs Other + id `name`.
+- Locator must MATCH both names and allow Button or Other; TabBar ancestor is native-only.
+
+## [2026-09-23] update | repos/mobile-automation-waits.md
+- `wait_for_condition(predicate, *, timeout_s=5, poll_freq=0.25)`: zero-arg callable only;
+  close over extra data. Timeout/poll are keyword-only. No `*args`/`**kwargs` forwarding.
+
+## [2026-09-23] update | repos/mobile-automation-waits.md
+- `wait_for_condition` now defaults `timeout_s=5` and `poll_freq=0.25`; predicate is first
+  so callers can omit both. `poll_freq > 1` is still milliseconds.
+
+## [2026-09-19] update | workflows/qa-platform-quarter-close-out.md
+- Full runbook for the end-of-quarter canvas: confirm umbrellas, leaf-walk REST,
+  sanity-check dates and capacity share, agree verdicts, then canvas. No markdown
+  packet. Skip blockers and new-ideas unless they are real. Why column: one clause,
+  no estimates. Filename `qa-mission-<n>-q<n>-close-out.canvas.tsx`.
+
+## [2026-09-19] update | tooling/cursor-canvas-authoring.md
+- Quarter close-out canvas filename and pointer to the close-out workflow.
+
+## [2026-09-19] update | workflows/qa-platform-sprint-kickoff.md
+- Related: quarter close-out is the skip-level sibling of kickoff.
+
+## [2026-09-19] update | workflows/qa-platform-quarter-close-out.md
+- Skip new-quarter ideas when the plan is carry: they restate milestones or
+  contradict the verdict table. Only keep ideas that are actually new work.
+
+## [2026-09-19] update | workflows/qa-platform-quarter-close-out.md
+- Skip the blockers section when the miss is sequencing and capacity inside the
+  same mission. Progress bars plus shipped / not shipped already answer what's left.
+
+## [2026-09-19] create | workflows/qa-platform-quarter-close-out.md
+- Quarterly mission status: leaf-task % per milestone (recursive subtask walk,
+  `num_subtasks == 0`), but lead with the committed-outcome %. Activity % and
+  outcome % disagree and the flattering one is usually the artefact of a milestone
+  nobody created tasks for. Carry vs pause turns on whether a dormant milestone was
+  starved or had its precondition never met.
+
+## [2026-09-19] create | tooling/python-local-https-certifi.md
+- macOS framework Python has no CA bundle, so stdlib `urllib` raises
+  CERTIFICATE_VERIFY_FAILED while `curl` works. Pass
+  `ssl.create_default_context(cafile=certifi.where())`; never disable verification.
+
+## [2026-09-19] update | tooling/cursor-canvas-authoring.md
+- Percent-complete bar = `UsageBar` with one segment and `total` as denominator.
+- `key` is rejected on local components too, not just SDK ones; wrap the mapped
+  element in a native `<div key>`. `React` namespace is out of scope for prop
+  annotations as well as return types.
+
+## [2026-09-19] update | workflows/qa-platform-sprint-kickoff.md
+- Kickoff canvas "Where we are" is speakable bullets (last sprint / this sprint),
+  not two paragraphs.
+
+## [2026-09-19] update | workflows/qa-platform-sprint-kickoff.md
+- Sprint `Done` is never cleared, so scope Completed by `completed_at` after the
+  previous dated packet. Board column and `completed` disagree both ways. Re-walk
+  umbrella parent chains every packet; parenting changes between sprints.
+
+## [2026-09-19] update | tooling/asana-api-cloud-agents.md
+- `memberships` on a project-scoped task list returns sections from every board the
+  task is multi-homed into; filter by the target board's section gids.
+
+## [2026-09-18] update | repos/mobile-automation-waits.md
+- Empty Android Chats after a messages deep link: remount via Unread/All chip ids,
+  not celery or a community GET. `wait_for_condition` poll_freq `1` is one second.
+
+## [2026-09-18] update | repos/mobile-automation-waits.md
+- Community create `sendbird_channel_url` is not a Chats-list ready signal; the 1:1
+  Sendbird verify step does not cover that wait.
+
+## [2026-09-18] update | repos/mobile-automation-waits.md
+- Hyperview ready is three layers: native fetch loader id, namespaced XML `id` as
+  RN `testID`, then optional `replace-inner` content. XML xmlns and page-object
+  `hyperview` are not identity; `wait_for_screen_id` is a text regex.
+
+## [2026-09-18] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Join Amplitude product `userId` to Sentry `user.id`. Amplitude events after the crash timestamp
+  are a relaunch; cut at Sentry time. Amplitude does not log picker-wheel opens.
+
+## [2026-09-18] update | workflows/mobile-android-login-local.md
+- Reverting a yarn patch via `git checkout` leaves `node_modules` patched; rebuilds then ship ids
+  absent from every tracked file, which read as pre-existing app behavior in a UI dump. Run
+  `yarn install` and grep the installed file after touching `.yarn/patches`, and check
+  `node_modules` when a dump shows an id the source does not explain.
+
+## [2026-09-18] update | tooling/staging-hyperview-picker-repro.md
+- Do not treat Sentry `device.free_memory` as jetsam pressure on iOS; a few hundred MB free on an
+  8–12 GB phone is normal. Check `device.class` across the issue before claiming a slow-device
+  pattern. This crash is ~95% high-class.
+
+## [2026-09-18] create | tooling/third-party-compose-sdk-locators.md
+- Vendor SDK screens dump as one ComposeView subtree with no `resource-id` under our own package
+  name; `testTagsAsResourceId` lives in the vendor's composables, so no app-owned id is reachable.
+- These locators are the first to break when `@element(id=)` flips from accessibility id to
+  resourceId: vendor-screen lookups fail while in-app ones on the same screen still pass.
+
+## [2026-09-18] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Count `ui.lifecycle` `beingPresented` repeats across events to get the real repro cadence; the
+  stack names the victim, not the precondition. Bound the OS floor from the `os` tag first, and
+  check `environment`/`release` for internal flavors before designing an in-house repro.
+
+## [2026-09-18] update | tooling/sentry-mobile-rn-upgrade-filter.md + staging-hyperview-picker-repro.md
+- Map crashing `dist` → git tag → `package.json` before accepting "cannot reproduce": same marketing
+  version can carry a different RN patch. A release with ~1 user is not a clean control.
+- Picker crash is RN 0.86.3-only in the field; 0.86.2 shipped to ~nobody. Build the 0.86.3 tag.
+
+## [2026-09-18] update | tooling/staging-hyperview-picker-repro.md
+- Cell-purge crashes need memory pressure, not just the right gesture: crashing devices sat at ~5%
+  free RAM. Force it (simulator memory warning, Zombie Objects diagnostic) instead of hand-racing.
+  Read `device.free_memory` vs `memory_size` in the event context before writing a manual repro.
+
+## [2026-09-18] update | tooling/staging-hyperview-picker-repro.md
+- Picker crash has two routes. Internal beta builds reproduce via idle: open the wheel, stop
+  touching, background/foreground, wait 6–10 min, then touch. Store users hit it via 3+ consecutive
+  picker opens 2–5s apart. Continuous spinning reproduces neither. iOS 26.4+, release-config build.
+- Internal and store populations can need different routes to one fingerprint; check the internal
+  environment's own events before handing someone the store repro.
+
+## [2026-09-18] update | tooling/staging-hyperview-picker-repro.md
+- Open my-dynamic-form in-app via `instawork://hv-dev/home/worker-app-my-dynamic-form`
+  (Django URL name). Path `/artforms/my-dynamic-form` is not a deep link; `hv-dev` is non-prod only.
+
+## [2026-09-18] update | tooling/staging-hyperview-picker-repro.md
+- Fabric `UIPickerView` hit-test crash: iOS 26 + my-dynamic-form / storybook
+  PickerField, touch the wheel while the modal is presenting.
+
+## [2026-09-18] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- iOS `_endSuspendingUpdates` + `UIPickerView hitTest` is one crash: group by
+  Fabric picker modal + native stack, not by which Hyperview screen opened it.
+
+## [2026-09-18] update | workflows/mobile-android-login-local.md
+- Gradle's JS bundle task ignores `node_modules`, so a yarn-patch-only change rebuilds an APK
+  that still embeds the previous bundle. Compare `assets/index.android.bundle` md5 across APKs;
+  clear `generated/assets/react/<variant>` to force it.
+- Orphaned `io.appium.uiautomator2.server` makes `uiautomator dump` exit 137; force-stop it.
+- Automation APK carries a bundletool-normalised `Jan 1 1981` mtime; judge build freshness by
+  ctime. Gradle output is `outputs/bundle/automationRelease`, not an `apk/automation*` dir.
+
+## [2026-09-18] update | workflows/xpath-to-id-app-target-resolution.md
+- Sendbird chat rows are UIKit; APIv2 already returns `sendbird_channel_url` on community
+  create and relationship GET. Stashing it in e2e does not locate the row until native
+  `testID` is on the Pressable.
+
+## [2026-09-17] update | tooling/appium-native-camera-locators.md
+- iOS video start and stop both keep `name` `VideoCapture`; a stop locator on label
+  `Stop Recording Video` is unnecessary.
+
+## [2026-09-17] create | tooling/appium-native-camera-locators.md
+- OS camera controls: one `IdSelector` Matches alternating Android resource id and iOS name
+  replaces the platform branch. `id=` is resource id, so `id="Done"` / `id="Take photo"` miss
+  even when the dump shows those as content-desc. Android reuses `shutter_button` for confirm.
+- iOS camera `name` and `label` disagree; `IdSelector` predicates on `name`, so the visible
+  caption (`Take Picture`, `Use Photo`) is never a usable id token.
+
+## [2026-09-17] update | workflows/xpath-to-id-app-target-resolution.md
+- An OS-owned duplicate text node cannot be hidden from Appium: instatest sets
+  `ignoreUnimportantViews: False`, so `importantForAccessibility` binds TalkBack, not the dump.
+- Third-party RN wrappers may forward an explicit prop allowlist; inherited `ViewProps` silently
+  never reach the native node. Read the wrapper's render before relying on a passthrough prop.
+
+## [2026-09-16] create | tooling/ios-accessible-hides-child-testids.md
+- XCUITest prunes the subtree of any view with `isAccessibilityElement`; RN `Touchable*` sets it
+  by default, so child `testID`s show on Android and vanish on iOS. `accessible={false}` restores
+  them; the wrapper then loses its aggregated `label`/`content-desc`.
+
+## [2026-09-16] update | repos/hyperview-local-mobile-sync.md
+- Prove which JS the app holds before blaming sync: automation builds embed `main.jsbundle` and
+  ignore Metro (no dev menu). Diff a marker count between Metro's served bundle and the installed
+  app's bundle via `xcrun simctl get_app_container`.
+
+## [2026-09-16] update | workflows/xpath-to-id-app-target-resolution.md
+- Android picker: `testID` on the Spinner host cannot own `.text`; an RN `Text` overlay can.
+  Neutralise Instawork Android `field-text-style` compensation margins on that overlay.
+  Instatest `id=` is UiAutomator `resourceId`, not Inspector `By.ID` autocompletion.
+
+## [2026-09-16] update | repos/hyperview-local-mobile-sync.md
+- Debug `fullstoryDevelopmentDebug` `No space left on device` is disk full, not Fullstory.
+  Reclaim `app/build`, `app/.cxx`, and Android `sdk/.temp`.
+
+## [2026-09-16] update | repos/hyperview-local-mobile-sync.md
+- Yarn 4 vs Classic lockfile: skip `yarn sync`; run `ts-node ./scripts/sync` from
+  `node_modules` instead of `yarn install` under Yarn 4. Dest path must be relative;
+  an absolute path is joined onto the Hyperview repo.
+- Root cause of the regression: corepack's global default Yarn flipped to 4.x (cache still holds
+  1.x), so a repo with no `packageManager` pin silently changes toolchain. Not a broken install.
+
+- First `yarn run:android` is a native compile. NDK 28 clang-19 crashes in `.cxx` are toolchain
+  flakes; delete `applicant-app/android/app/.cxx` and retry. Not a Hyperview JS issue.
+
+## [2026-09-16] update | workflows/xpath-to-id-app-target-resolution.md
+- Inner picker `testID` labels the Spinner / UIPickerView host, not `text1` or iOS FieldLabel.
+- Hyperview dropped the iOS-testID/Android-accessibilityLabel helper for plain `testID` on both;
+  check which shape the build ships before concluding an Android id is impossible.
+- Moving an id off a wrapper breaks index-based lookups; prefer a derived `{id}/…` child id.
+- Shared MDS input steps both click and read `.text` off one element, so "one id for both" needs a
+  node doing both; OS-inflated value children (`text1`) can never take an app id.
+
+## [2026-09-14] update | workflows/mobile-android-login-local.md
+- After a long Android local run, session create can stay wedged through cold boot.
+  Uninstall Appium Settings + UiAutomator2 server packages, then retry the failed
+  scenario alone.
+
+## [2026-09-14] update | repos/mobile-automation-waits.md
+- Screen-loaded: Gherkin still instantiates only; reuse `wait_for_load` /
+  `is_loaded`. Applicant override waits on `screen_id` text regex, not
+  `load_check_selector`; Hyperview chrome id is not content-ready.
+
+## [2026-09-14] create | tooling/staging-hyperview-picker-repro.md
+- Staging select-wheel repro: skip v2/OpenSearch; use my-dynamic-form or a preview artform intro URL.
+
+## [2026-09-14] update | workflows/app-store-connect-unsubmit-build.md
+- Pause is only for a phased iOS release (≤30 days). A 100% live version cannot be paused.
+
+## [2026-09-14] update | preferences/global.md
+- Store-version error triage: only flag issues with more events on this
+  version than prior ones; 1–4 unique users on that version is not critical.
+
+## [2026-09-14] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- After a Fabric hotfix, query the hotfix `release:` for native SIGSEGV, not only
+  `firstRelease:` of the hotfix. Enumerate crashes split by caller into multiple
+  issue ids; sum by title.
+
+## [2026-09-11] update | preferences/global.md
+- Added: do not include test-run invocation details unless the user asks for them.
+
+## [2026-09-11] update | workflows/mobile-android-login-local.md
+- Compose from the repo root needs `-e HOST_WORKSPACE=<repo>/e2e/mobile` or Appium looks for the
+  APK under `<repo>/applicant-app/bin`. `--name '[25022]...'` is a regex; use the digits only.
+
+## [2026-09-11] update | workflows/xpath-to-id-app-target-resolution.md
+- A shared step's widget helper belongs in a widget mixin mixed into the hosting screens
+  (`GigsListTabBarMixin` pattern), not on a screen base; ids stay on the `*Component` class.
+- Component-declared `@elements` resolve scoped to the wrapped element, so the lookups live on the
+  mixin. Screen bases cannot import components (cycle); judge cycles from module-body imports only.
+
+## [2026-09-11] update | repos/mobile-automation-waits.md
+- `driver_context.wait_until` returns False on timeout instead of raising, takes any predicate, and
+  zeroes the implicit wait while polling: wait for a *matching* element, then re-read and assert.
+
+## [2026-09-11] update | repos/mobile-vendored-instatest.md
+- instawork keeps its own vendored copy at `instawork/lib/instatest/instatest/`; `e2e/mobile/lib/instatest`
+  is an empty compose mount point, so framework source looks missing from inside `e2e/mobile`.
+
+## [2026-09-11] update | workflows/xpath-to-id-app-target-resolution.md
+- Hyperview derives child ids like `{id}/field-label` per element, not by convention: `hv-date-field`
+  has one, `hv-picker-field` does not. Verify the suffix in the element source at the hyperview tag
+  `core-mobile/package.json` pins before writing it into a locator.
+
+## [2026-09-11] update | workflows/xpath-to-id-app-target-resolution.md
+- Stale iOS Automation `.app` (embedded bundle) can hide `{testID}/text-input` and look like a
+  platform split; check e2e bin mtime vs the Android APK before keeping an iOS xpath.
+
+## [2026-09-11] update | preferences/global.md
+- Added: scope locator/test fixes to cases proven broken by a report or run; do not pre-emptively
+  change inference-only matches, let the next run surface them.
+
+## [2026-09-11] update | workflows/xpath-to-id-app-target-resolution.md
+- Validation scoping for a locator-class fix: one scenario per unique locator, not per failing test.
+- Long scenarios mask later instances of the same defect, so each fix reveals the next a run later;
+  sweep typed fields statically instead of iterating one field per device run. Score by which step
+  failed, not pass/fail.
+
+## [2026-09-11] update | workflows/mobile-ci-allure-failure-triage.md
+- Runs can target a per-PR `demo-<pr>` backend, so server-rendered locator ids come from that
+  branch's head; verify ancestry of the id commit against the served SHA. Sibling exact-id
+  lookup passing in the same second is the tell for a missing template id, not a driver break.
+
+## [2026-09-11] update | workflows/xpath-to-id-app-target-resolution.md
+- `/text-input` migration: repoint the existing id constant; do not add a parallel
+  element + platform selector pair for the same field.
+
+## [2026-09-11] update | repos/mobile-automation-waits.md
+- `wait_while_loading_screen_exists` is a 5s ProgressBar xpath miss then a no-op;
+  full `page_source` equality is not an at-top signal for pull-to-refresh.
+
+## [2026-09-10] update | repos/mobile-automation-waits.md
+- Screen readiness is a positive loaded id, not copy and not a global shimmer-gone wait;
+  absence-only loader waits race if the skeleton has not mounted yet.
+
+## [2026-09-10] update | workflows/mobile-android-login-local.md
+- After a long local Android scenario, the next Appium session can fail on
+  `hidden_api_policy` adb timeout; retry that scenario alone, do not change locators.
+
+## [2026-09-10] update | workflows/mobile-android-login-local.md
+- instawork e2e/mobile compose cwd is not a git work tree; mount repo `.git` at
+  `/workspace/.git` or applicant login_steps `git rev-parse` exits 128 at import.
+
+## [2026-09-10] update | workflows/xpath-to-id-app-target-resolution.md
+- Shared Behave steps that used driver-global wait_for cannot move onto one screen class.
+  Grep feature usages first; put the helper on the shared component. `@elements` does not wait.
+
+## [2026-09-10] update | workflows/mobile-android-login-local.md
+- The automation APK bakes its JS bundle, so RN source edits need `yarn build:android:automation`;
+  verify a shipped id by byte-searching `assets/index.android.bundle` inside the zip, not `strings`.
+
+## [2026-09-10] update | workflows/xpath-to-id-app-target-resolution.md
+- RN `Touchable > View testID > Text` rows: id node has empty text, label is on the unlabelled
+  child. Give the `Text` its own sibling-key id in `ids.ts` and match on it; fix missing `testID`
+  in the typography prop types rather than suppressing the type error at the call site.
+
+## [2026-09-09] update | workflows/xpath-to-id-app-target-resolution.md
+- RN TextField: container keeps the passed testID; the EditText is `{testID}/text-input`.
+
+## [2026-09-09] update | workflows/xpath-to-id-app-target-resolution.md
+- MDS autocomplete puts `id_field` on both the wrapper ViewGroup and the child EditText.
+  Id lookup returns the wrapper first; placeholder/value is on the EditText.
+
+## [2026-09-09] update | workflows/xpath-to-id-app-target-resolution.md
+- `Matches` patterns must use `[0-9]`, not `\d`: iOS NSPredicate string literals eat the
+  backslash, so the same pattern passes on Android and returns nothing on iOS. Also:
+  `@element(id=)` is always literal `Equals`; regex requires an explicit Matches operator.
+
+## [2026-09-08] update | tooling/instawork-automation-api.md
+- Demo/QA bulk cleanup: delete shift-groups → transactions → company-payment-sources →
+  companies → worker dependents → incentives via `delete-by-worker` + exact `incentive__goal`
+  → workers. Company/worker DELETE HTML 500s are leftover FK rows, not missing endpoints.
+
+## [2026-09-08] update | workflows/xpath-to-id-app-target-resolution.md
+- Entity-id locators must resolve from the current account’s grouping, not a global worker
+  list or a `context.*_id` stash. Create snapshots omit write-only `worker_id`; list unique
+  groups until the logged-in worker is on one, then pick a coworker.
+
+## [2026-09-08] update | workflows/xpath-to-id-app-target-resolution.md
+- Ids embedding an entity id must take that value from screen scope, not a global test-data
+  list; the replaced XPath was self-scoping, so the regression is migration-only. `find()`
+  returns `default` on a miss and takes `timeout_s`, so probe candidates instead.
+
+## [2026-09-08] update | workflows/ruff-noqa-cleanup-pipeline.md
+- Instatest + e2e/mobile Ruff CI is `lint-e2e`; local recipe is `just ruff-e2e`. Root
+  `lint-ruff` still excludes `lib/instatest`.
+
+## [2026-09-08] update | workflows/ruff-noqa-cleanup-pipeline.md
+- PLC0415 peel: nested imports that break cycles cannot become `from module import Name`;
+  use a module alias (often both sides) or TYPE_CHECKING for annotations-only.
+
+## [2026-09-08] update | workflows/xpath-to-id-app-target-resolution.md
+- IdSelector/partial_id on florent uses Android resource-id; legacy content-desc xpaths and
+  get_attribute("content-desc") uniqueness must be realigned (and dumped) when HV drops the
+  accessibilityLabel testID hack.
+
+## [2026-09-08] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Hotfix `firstRelease:` is not the RN-ship marker; prove RN from git tags and
+  compare Fabric issue `release` tags. WebView/syscall AppExitInfo ANRs are not
+  Fabric.
+
+## [2026-09-08] update | workflows/xpath-to-id-asana-task-format.md
+- `_android` / `_ios` same-stem siblings share one id; migrate both even if the map lists one.
+
+## [2026-09-08] create | tooling/git-shallow-fetch-unrelated-histories.md
+- A depth-1 fetch of master in a full clone writes `.git/shallow` and leaves master as a
+  one-commit island, so merge reports unrelated histories. Unshallow; do not allow-unrelated.
+
+## [2026-09-08] update | preferences/global.md
+- Prefer full MDS `{namespace}/…` ids over `partial_id`; namespace is the view attribute.
+
+## [2026-09-08] update | workflows/xpath-to-id-app-target-resolution.md
+- MDS `{id}-loading` / `{id}-disabled` siblings are also hit by `partial_id` Contains; use
+  anchored `Matches` for namespaced suffixes.
+
+## [2026-09-07] update | workflows/self-review-workflow.md
+- `lint-e2e` unused-step scan runs on HEAD, not the three-dot PR diff. A step missing on
+  GitHub `master` but present on the branch is stale-base, not a new unused definition.
+
+## [2026-09-07] update | workflows/instawork-local-hiring-opensearch-setup.md
+- Disabling the grouping constance flag to fix empty browsing also strips the grouped-jobs UI,
+  so those scenarios find nothing. It is DB-backed and persists; check it, don't assume.
+
+## [2026-09-07] update | workflows/self-review-workflow.md
+- `lint-e2e` unreferenced-Behave-step scan can fail on master-identical unused
+  steps; compare the cited path to master before attributing it to the PR.
+
+## [2026-09-07] update | workflows/mobile-android-login-local.md
+- `instatest list` needs a nested subcommand (`devices` / `applications` / `servers`);
+  bare `list` is an argparse error, not a successful no-op.
+
+## [2026-09-07] create | workflows/instawork-local-hiring-opensearch-setup.md
+- Jobs tab empty locally is an infra gap, not missing data: OpenSearch is behind the `full`
+  compose profile. Sync lands jobs in MySQL only; `upsert_all_jobs()` is the step that makes
+  them searchable, and reconcile does not do it despite its docstring.
+
+## [2026-09-07] update | repos/instawork-prod-only-settings-local-500.md
+- `instawork/local_secrets.py` is the gitignored, last-imported settings override hook — use it
+  for dummy URLs instead of tracked settings modules. Added: the crashing URL line sits outside
+  the service's `try`, and a constance gate may not cover every caller of the same service.
+
+## [2026-09-07] create | repos/instawork-prod-only-settings-local-500.md
+- `NoneType` URL crash = prod-only setting unset locally; prefer the upstream constance gate,
+  and verify the fallback on the active branch before trading a 500 for an empty list.
+
+## [2026-09-07] update | workflows/xpath-to-id-app-target-resolution.md
+- Unlabeled Hyperview views expose 32-char hex resource-ids that are style hashes, not locators.
+
+## [2026-09-07] update | repos/mobile-automation-waits.md
+- Three different wait defaults: `element()` 5s, `wait_for` 10s, suite `wait_for_element` 3s.
+  Don't carry a `timeout_s` override across a conversion; `--timeout` raises them all at once.
+
+## [2026-09-07] update | repos/mobile-automation-waits.md
+- `element(...)` default wait is 5s (`explicit_wait` env), not the 10s `wait_for` DEFAULT.
+
+## [2026-09-07] update | workflows/qa-platform-sprint-kickoff.md
+- Week-two This week is the spoken plan: drop themes the user takes out of the sprint
+  from the canvas (keep them in markdown inventory); leftover volume they say to push
+  stays speakable even when the pile is large.
+
+## [2026-09-07] update | preferences/global.md
+- New: never label a cell/column/card/stat with a bare identifier code (`Mn`, `P4.x`, lint code);
+  show the readable title. Generalizes the kickoff-only "speakable focus lines" gotcha.
+
+## [2026-09-07] update | workflows/qa-platform-sprint-kickoff.md
+- Week-two Last week table is `Milestone | Slice | Task | Owner`; milestone is an ancestor hop,
+  and a uniform column is a valid answer. Cell shows the readable `Mn: <name>` title minus the
+  mission prefix; the bare `Mn` code is not speakable.
+
+## [2026-09-07] update | tooling/asana-api-cloud-agents.md
+- Parent-chain walk to find the `milestone` ancestor; one `parent` hop returns an epic, and
+  title prefixes are derived, not source.
+
+## [2026-09-07] update | tooling/asana-api-cloud-agents.md
+- Board URL `/board/<id>` is a view gid; use project sections or project tasks, not that id as
+  `section`.
+
+## [2026-09-07] update | workflows/qa-platform-sprint-kickoff.md
+- Week-two canvas is a check-in (last week + this week's focus). Keep Carry Over / New In
+  Sprint / Full Workload in the markdown only.
+
+## [2026-09-07] update | tooling/cursor-canvas-authoring.md
+- Kickoff vs week-two canvases use different layouts; do not copy kickoff inventory chrome
+  onto week two.
+
+## [2026-09-04] update | workflows/ruff-noqa-cleanup-pipeline.md
+- B012 peel (`return` in `finally`) swallows re-raises; treat like E722 (both-app both-platform
+  smoke) unless the `except` already swallows.
+
+## [2026-09-04] update | workflows/mobile-android-login-local.md
+- `python -m instatest` must start in the app dir (`./configuration` frozen at import). `list`
+  has no `-v`; default console hides DEBUG; `list_config` uses an unconfigured `instatest` logger.
+
+## [2026-09-04] update | repos/instawork-mobile-e2e-shared-pythonpath.md
+- Compose PYTHONPATH now `/workspace:/workspace/lib/instatest` (CI-matching); old instatest-only
+  claim corrected, verify the service `environment` before assuming.
+
+## [2026-09-04] update | workflows/mobile-browserstack-qa-docker.md
+- instawork `e2e/mobile`: framework is the mounted `../../lib/instatest`, no pip copy in the image;
+  `.vscode/scripts/run-automation.sh` is the canonical compose-run shape (application platform
+  suffix, `.git` mount, HOST_WORKSPACE override); `.env` localhost URLs drift against the QA
+  `BACKEND_INSTANCE` default, override with `-e`.
+
+## [2026-09-04] update | workflows/ruff-noqa-cleanup-pipeline.md
+- E722 peel in Instatest is a catch-narrowing behavior change; follow with both-app both-platform
+  mobile smoke, not lint-only.
+
+## [2026-09-03] update | workflows/ruff-noqa-cleanup-pipeline.md
+- T201 peel: logging or delete for debug prints; keep `print` for CLI. `sys.stdout.write`
+  is not a fix.
+
+## [2026-09-03] update | workflows/ruff-noqa-cleanup-pipeline.md
+- Executor follows the card body (Scope/Steps/Done when). All board cards use the noqa-peel
+  shape; ignore-Prompt is obsolete.
+
+## [2026-09-03] update | tooling/asana-api-cloud-agents.md
+- Move a task already on a board with `POST /sections/<gid>/addTask`. `addProject` is for
+  first-time multi-home.
+
+## [2026-09-03] update | workflows/ruff-noqa-cleanup-pipeline.md
+- Card body is the spec: Scope is Code + one Path; Steps peel `# noqa` then fix; Done when is
+  a draft PR that keeps the Ruff CI job green. Gold card is E712 on e2e/mobile.
+
+## [2026-09-03] update | workflows/ruff-noqa-cleanup-pipeline.md
+- Same Ruff code in `lib/instatest` and `e2e/mobile` is two cards. Executor fails if the diff
+  crosses trees or the card names both / neither path.
+
+## [2026-09-03] create | workflows/ruff-noqa-cleanup-pipeline.md
+- Ruff board executor peels `# noqa` for title codes then fixes; ignore the card's old autofix
+  Prompt; `[e2e/mobile]` is `e2e/mobile`, `[Instatest]` is `lib/instatest`.
+
+## [2026-09-03] update | tooling/asana-api-cloud-agents.md
+- Board column work is REST-only: list `/projects/<gid>/sections` for column gids, place tasks
+  with `/tasks/<gid>/addProject` (additive, works for subtasks), verify via
+  `/sections/<gid>/tasks`. REST is also the fallback when local MCP returns `network_error`.
+
+## [2026-09-02] update | repos/mobile-step-definition-conventions.md
+- Anchored id regex via `Selector.by_id(..., operator=MobileOperator.Matches)` is the cross-platform
+  answer to prefix collisions; `[0-9]` over `\d` because of UiSelector string embedding.
+
+## [2026-09-02] update | workflows/xpath-to-id-app-target-resolution.md
+- Django `id_<field>_<index>` plus a suffixed child is a `partial_id` trap; use exact indexed ids.
+
+## [2026-09-02] update | repos/mobile-step-definition-conventions.md
+- `steps.usage` is not a CI unused-step check: Gherkin-only, one app, environment.py still loads.
+
+## [2026-09-02] update | repos/mobile-step-definition-conventions.md
+- Unused step definitions: `behave --dry-run -f steps.usage --no-summary`; Instatest
+  needs `--behave-args` (`+f` not `-F`); Gherkin-only, tag/app/exclude_re false positives.
+
+## [2026-09-02] create | workflows/xpath-to-id-asana-task-format.md
+- Locked Asana card format for the XPath-to-id pipeline: title prefix, four sections only,
+  shared Steps, Locator map fields with Candidate id (not App target id), optional attachment
+  as screen context only. Cross-linked from app-target-resolution.
+
+## [2026-09-02] update | workflows/xpath-to-id-asana-task-format.md
+- After `</h2>`, body must start on the same line with no whitespace; `</h2>\n` renders as a
+  blank under the heading. One `\n\n` between sections only.
+
+## [2026-09-02] update | workflows/xpath-to-id-asana-task-format.md
+- Description spacing: no blank after headings, one blank between sections; no PR link in the
+  body (PR stays in comments).
+
+## [2026-09-02] update | workflows/xpath-to-id-app-target-resolution.md
+- Bulk-corrected Candidate ids across xpath-to-id board: attire is OS camera not HV capture;
+  artforms options are `id_step-<field>_N`; end-time radios still need an added option id;
+  Sendbird channel rows have no app id in checkout.
+- Pipeline field renamed from App target id to Candidate id. Verify against live screen owner
+  before migrating; do not invent a new id when the candidate misses.
+
+## [2026-09-02] update | tooling/browserstack-app-automate-api-cloud-agents.md
+- BrowserStack has no post-session page-source API; Appium logs only contain hierarchy XML if the
+  test called getPageSource. Locator misses alone do not dump the DOM.
+
+## [2026-09-02] update | preferences/documentation.md
+- Asana comments must be plain `text`; `html_text` is stored as literal escaped markup and the
+  reader sees raw tags. Rich text applies to task descriptions only.
+
+## [2026-09-02] create | workflows/xpath-to-id-app-target-resolution.md
+- XPath-to-id App target id must follow live screen owner: Hyperview template `id=` /
+  Django `id_<field>` vs native `ids.ts`. An OR xpath that includes RN paths is not
+  proof RN is live; tracking event names are not element ids.
+
+## [2026-09-02] update | tooling/cursor-canvas-authoring.md
+- Canvas has no Image component: attach Allure failure PNGs via workspace download + Button
+  openFile, one representative frame per task from all_error_details screenshot field.
+
+## [2026-09-01] create | repos/mobile-automation-waits.md
+- Mobile e2e wait primitives inventory plus two traps: a wait step implemented as
+  `implicitly_wait` does not pause the scenario and leaks a session-wide timeout, and
+  `screen should be loaded` only instantiates the screen class so it cannot replace a sleep.
+  Poll-interval sleeps inside retry loops convert to `wait_for_condition` rather than being deleted.
+
+## [2026-09-01] update | preferences/documentation.md
+- Asana `html_notes` has no table support and renders `<pre>` as a line-numbered code box, so
+  tabular task data must be nested lists. Spacing: one newline between sections, none after a
+  heading.
+
+## [2026-09-01] update | tooling/ruff-enable-excluded-tree.md
+- Run `ruff check --fix` before `ruff format`; lint autofixes can require a later format pass.
+
+## [2026-08-31] create | workflows/app-store-connect-unsubmit-build.md
+- Unsubmit an unpublished App Store version: withdraw from review to Developer Rejected, remove
+  the Build with the red minus, attach a higher CFBundleVersion. Version rows cannot be deleted.
+
+## [2026-08-31] create | workflows/play-console-discard-release.md
+- Discard an unpublished Play Console release: Publishing overview Remove changes, then Discard
+  release on the track version. Production dashboard and Create new release are not discard.
+
+## [2026-09-01] update | tooling/instawork-automation-api.md
+- Booking prerequisites seeding: eligibility via run-celery-task + SpecialRequirementFactory;
+  success guide via worker-score etiquette_score < 80; optional attire upload needs preset only.
+
+## [2026-08-31] update | repos/mobile-pre-booking-hold-review.md
+- QA Constance for hold eligibility can be 360h (15 days); always read live value before seeding.
+  Grant worker_access with `worker` (not worker_id).
+
+## [2026-08-31] create | repos/mobile-pre-booking-hold-review.md
+- "Please review the shift details" / disabled Continue booking needs an unbooked marketplace
+  gig (not API-booked), starts beyond GIG_HOLD_GIG_DETAILS_TIME_TO_START_HOURS, and a worker with
+  no completed shifts at that company; Book in-app creates HOLD_GIG_DETAILS_REVIEW.
+
+## [2026-08-31] create | workflows/integration-branch.md
+- Integration PRs only collect other PRs. Commits must come from merging those PRs, not unique
+  work on the branch. Name `integration/<topic>`, add the `integration` label, and list `#PR`
+  (or a hash if there is no PR) under "Integrate the following PRs / commits:".
+
+## [2026-08-31] update | tooling/instawork-automation-api.md
+- Gig template GET omits company/business; resolve company via template contacts then company_user.
+- Required attire-upload booking prerequisite is a company-scoped attire_upload vetting module plus
+  an attire preset, not a shift-group field. Leave the shift unbooked and grant worker_access.
+
+## [2026-08-31] update | preferences/global.md
+- Never send Slack messages unless the user explicitly asks. Completing related work is not
+  permission to post.
+
+## [2026-08-31] update | workflows/asana-bug-report.md
+- Device-screen crop must be measured (longest contiguous light run bounded by bezel bands) and
+  eyeballed on a rendered frame; a slightly narrow crop silently clips right-edge UI and still
+  looks valid. Added a section for replacing evidence on a live ticket: re-fetch `html_notes` right
+  before the write, regex-swap attachment gids only, then delete the superseded attachment.
+
+## [2026-08-31] update | workflows/qa-platform-sprint-kickoff.md, tooling/cursor-canvas-authoring.md, index.md
+- Canvas step 6 now locks speaking structure: Mission accent + openFile button, stats +
+  definition table, Where we are (mission prose), What is next? (contributor cards),
+  Blocking, Completed backup. Canvas-only milestone omit allowed; focus lines must be
+  speakable. Authoring page matches Cards + UsageBar, not topLeftLabel prose.
+
+## [2026-08-31] update | tooling/cursor-canvas-authoring.md
+- Stacked `BarChart` cannot label "who works on what"; use per-person `UsageBar` with
+  `topLeftLabel` / `topRightLabel` and a shared `total` for comparable lengths.
+
+## [2026-08-31] update | workflows/qa-platform-sprint-kickoff.md
+- Kickoff markdown and canvas both open with Completed, Carry Over, New In
+  Sprint, Full Workload plus the same definition table. Canvas step 6 copies
+  those labels; the markdown skeleton is the packet source.
+
+## [2026-08-31] update | tooling/cursor-canvas-authoring.md, workflows/qa-platform-sprint-kickoff.md
+- Kickoff headline stats stay short: Completed, Carry Over, New In Sprint, Full
+  Workload. Meaning lives in the definition table under the strip.
+
+## [2026-08-31] update | tooling/cursor-canvas-authoring.md
+- `Stat` has no sublabel, so the label must name what is counted and its source. Pair a
+  stat strip with a `Number | What it counts | Source` table; never show a derived total
+  without its inputs.
+
+## [2026-08-31] update | workflows/qa-platform-sprint-kickoff.md, tooling/cursor-canvas-authoring.md, index.md
+- Coming sprint is Planning `Needs Triage` and `Next` under confirmed umbrellas, not a
+  second user-confirm pass. After the markdown packet, generate a canvas from that file.
+
+## [2026-08-31] update | tooling/asana-api-cloud-agents.md
+- Cloning a task's formatting: fetch the model task with `opt_fields=html_notes` and copy the
+  markup verbatim rather than re-authoring from the rendered view. Documented tag allowlist is
+  incomplete — `<table>`/`<tr>`/`<td>` work; `<pre>` needs `<`/`>` escaped.
+
+## [2026-08-30] create | tooling/cursor-canvas-authoring.md, index.md
+- Canvas authoring: managed `canvases/` path is mandatory, SDK prop types reject React `key`
+  (no `.map()` over `Stat`), `React.ReactNode` namespace unavailable, emoji forbidden, empty
+  sections must collapse into a coverage table, `Canvas TypeScript check` is the truth signal.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Plan section is `# 🚀 New in coming sprint` (week two: `# 🚀 New this week`). Carry-over
+  stays in the table above; this section is new adds by milestone only.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md, index.md
+- Kickoff packet format is a required file skeleton. Copy structure from the latest
+  kickoff packet, not its inventory. Coming sprint is user-confirmed new adds only;
+  previous-sprint Sprint To-Do is always carry-over.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Previous-sprint Sprint `To-Do` is carry-over, including not-started. Do not omit it.
+  Coming sprint is only work the user is newly adding.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Leftover Sprint To-Do stays in Carrying over, including parked items. Do not omit it
+  from the packet. Coming sprint is still new-adds only.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Sprint leftover `To-Do` on an in-flight slice is carry-over, not coming-sprint new work.
+  Coming sprint is only what the user is newly adding.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Coming-sprint new work must be on QA Platform - Sprint (or the user explicitly adds it).
+  Planning/Backlog-only and no-board tasks stay out.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- For coming Sprint is new work only. Never repeat In Progress / In Review from Carrying over.
+  A milestone with only carry-over still gets the ℹ️ empty note.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Coming-sprint (and week-two) work uses the same Feature / Summary / Tasks table as
+  carry-over. Heading N is two-week-plan Asana tasks only. Empty milestones stay ℹ️.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Coming-sprint work uses the same Feature / Summary / Tasks table as carry-over. Empty
+  milestones stay `ℹ️`. Heading total is the two-week plan only, not queued slices.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Recap headings are `## ✅ Completed`, `## 🔄 Carrying over`, then `# 🚀 For coming Sprint`
+  (week two: For this week).
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Recap/plan break is only `# For coming Sprint` (week two: this week). No `---` and no `<hr>`.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Recap/plan break is an 8px HTML `<hr>` plus `# For coming Sprint` (week two: this week).
+  Do not use markdown `---`; it is too thin in preview.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- After carry-over, `---` then `## For coming Sprint` (week two: `## For this week`)
+  before any `Mn:` heading. That is the recap vs plan break.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Empty milestone note is `ℹ️ Nothing here for the starting sprint.` (week two: this week)
+  so the empty state is visible in a scan.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md, preferences/documentation.md
+- One task per table row. No multi-line cells at all: the formatter strips `<br>` and flattens
+  `<ul><li>` into inline `- `, so shared columns are filled on the first row of the group only.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md, preferences/documentation.md
+- Superseded same day: `<ul><li>`/`<div>` in table cells did not survive the formatter either.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Carrying-over Tasks cells start with `- `. Completed stays ✅.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Carrying over uses the same Feature / Summary / Tasks table. No ✅. ❌ does not count toward N.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Completed assignee is `[Firstname]` after the task link, not a nested bullet.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Completed assignee is a nested line under the task (`&nbsp;&nbsp;- Firstname`), not inline.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Completed Tasks column uses ✅, not `-`. Carry-over lists stay dashes.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Feature count is `[n tasks]` on the line after the breadcrumb, not parentheses.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Feature count sits on the line after the breadcrumb: `<br>(n tasks)`.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Completed table assignee suffix is `(Firstname)`, not `-- Firstname`.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Feature breadcrumb count is `(n tasks)` / `(1 task)`, not a bare `(n)`.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Completed table is Feature (milestone > theme > slice) | Summary | Tasks. Outcome text stays out of Feature.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Feature cell is `**Name (n tasks)**` plus one high-level outcome sentence. Do not restate task titles.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Completed table bullets are `- [title](url) -- Firstname`. Unassigned if none.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Completed is a Feature | Tasks table (per-row counts, `<br>`-joined links) and replaces the separate Backup Done list.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Milestone headings include a one-sentence Goal. Completed recap is counts (`Theme (n tasks)`), not a task dump.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Packet opens with completed (ending sprint) and carrying-over bullets. Full Done list stays in Backup.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Packet always emits every confirmed umbrella heading. Empty starting-sprint work is a note, not a skipped section.
+
+## [2026-08-30] update | preferences/documentation.md
+- Recorded preference: Asana task descriptions use rich text with real headings, never plain-text markdown.
+
+## [2026-08-30] update | tooling/asana-api-cloud-agents.md
+- `html_notes` is required on create too, not only on edit. `XML is invalid` on create is usually `<p>`/`<br/>`; never fall back to plain `notes`, which renders markdown literally.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Never change Asana unless the user explicitly asks. Packet writes are not permission to write Asana.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Packet filename includes date and mode so runs are kept. Same date and mode overwrites that file only.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Packet is `qa-platform-sprint-packet.md` (overwrite, not wiki). Asana permalinks; ❌ if no task. Chat is the path only. Short, no filler.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Removed Local/CI parity device-match sequencing. That is dry-run/sprint packet data, not runbook.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Local/CI parity first slice is local debug/run devices matching CI; skins and screen-size later.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Spoken lists are grouped by milestone, not by theme or person first.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Sprint list API: section or project, not both. Umbrellas often have no membership. Match the Sprint slice by parent chain; owner-assigned work outside the umbrellas stays out unless the user adds it.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Starting-sprint known list is carry-over. New subtasks are reasoned from in-progress work as suggestions only; the user confirms or substitutes.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Kickoff main goal is the starting-sprint task list and who will work on what. Where-we-are and blocking stay supporting; done recap stays backup.
+
+## [2026-08-30] update | workflows/qa-platform-sprint-kickoff.md
+- Ask kickoff vs week two before formatting. Kickoff speaks plan, who, where, blocking; ending-sprint done recap stays as a labeled stakeholder backup. Week two uses last-7-day completions, not the full Done column.
+
+## [2026-08-30] update | workflows/qa-platform-story-pointing.md
+- Renamed from `qa-story-pointing.md` so QA Platform runbooks share the `qa-platform-` prefix. Inbound links updated.
+
+## [2026-08-30] create | workflows/qa-platform-sprint-kickoff.md
+- Mission-owner Monday packet: Confluence working notes as quarter backbone, Asana umbrellas as the tree, Sprint board membership as the speakable slice. Ending-sprint recap plus starting-sprint plan with carry-over and assignees. Re-confirm umbrellas when the quarter page changes.
+
+## [2026-08-30] update | workflows/qa-platform-pre-grooming.md
+- Related: sprint kickoff is a different board and meeting than Planning Needs Triage.
+
+## [2026-08-28] update | tooling/ruff-enable-excluded-tree.md
+- Grandfather import-order (`I001`) and unused-import (`F401`) with `--add-noqa`; do not `--fix` them.
+
+## [2026-08-28] update | tooling/ruff-enable-excluded-tree.md
+- After format lands, keep the tree in `extend-exclude` when a dedicated job is the sole gate (do not fold it into `ruff check .`).
+
+## [2026-08-28] update | tooling/ruff-enable-excluded-tree.md
+- Nested checkout without a parent `__init__.py`: use `namespace-packages`, not a per-file `INP001` ignore.
+
+## [2026-08-28] update | tooling/ruff-enable-excluded-tree.md
+- Do not use a package-wide `per-file-ignores` peel-off list: it disables rules for new code. Auto-fix safe hits, then `--add-noqa` remaining lines. Format can move a violation off the noqa line.
+
+## [2026-08-28] update | tooling/ruff-enable-excluded-tree.md
+- Format-only PRs stay config-free; drop the path from `extend-exclude` on the lint PR after format lands.
+
+## [2026-08-28] update | tooling/browserstack-test-management-api.md
+- Resolve `test-plans/<web#>` via `urls.self` → `TP-####`; plan/run `?id=` does not filter.
+- Credential load: username may lack `export`; probe username×key pairs — exported access key can be stale.
+- MCP Test Management 401: fall back to REST with the probed pair.
+
+## [2026-08-28] update | preferences/global.md
+- Commits/pushes require an explicit ask; implementing files is not permission to commit.
+
+## [2026-08-28] create | tooling/ruff-enable-excluded-tree.md
+- Keep an excluded tree in `extend-exclude` until format is applied; `[format] exclude` does not protect `ruff format --check .`.
+- Parse errors need a file exclude; `INP001` can appear only on a repo-root check.
+
+## [2026-08-27] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- `@ios` is a Behave filter, not a runtime lock; Android is the default platform and there is
+  no `@android` tag. Platform-specific locator diffs still need a run on that platform.
+
+## [2026-08-27] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- Platform-specific locator diffs are only validated on that platform. Caller `@ios`/`@android`
+  tags are CI filters, not blast-radius proof; prefer steps that always hit the locator over
+  find/tap search fallbacks.
+
+## [2026-08-27] update | tooling/android-rn-native-crash-repro.md
+- Don't keep activities is `settings put global always_finish_activities 1`; Samsung UI path is
+  Developer options → Apps → Don't keep activities.
+- Separate repro amplifiers from user repro steps: a dev-options toggle makes a real lifecycle
+  transition deterministic but must never appear in a ticket's Steps to Reproduce, and frequency
+  claims come from event/user counts, not from how easily the amplified setup crashes.
+- `am kill` mimics the low-memory killer (what real users hit); `force-stop` is closer to a manual
+  force-stop and also sets the stopped flag.
+
+## [2026-08-27] create | tooling/android-rn-native-crash-repro.md
+- Fabric/native teardown races need the preconditions forced ("Don't keep activities", process kill)
+  and a device class that matches the reporter; a warm flagship session surviving the steps is a weak
+  negative, not evidence.
+- Filtering logcat on the C++ symbol taken from a Sentry native frame never matches; native SIGSEGV
+  output lands under the `libc` / `DEBUG` tags.
+
+## [2026-08-27] update | workflows/asana-bug-report.md
+- 1 fps frames locate the window but cannot prove sub-second ordering; resample just that window at
+  4 fps with `-ss/-t` and count frames between events.
+
+## [2026-08-27] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- After store ship, `firstRelease:` the first store string + `environment:release` lists
+  issues new to that build. That is not the same as “caused by the upgrade.”
+
+## [2026-08-27] update | tooling/instawork-automation-api.md
+- List views whose docstring claims creation-date ordering can have no ordering at all; paged sweeps
+  over them cannot prove absence. Verify `filterset_fields` and model `Meta` first.
+- Name-based filters are useless against factory-seeded rows; locate leftovers by probing the hash IDs
+  a seeding loop produced.
+- Worker assignment rows are independent of the shift's worker FK, so deleting an assignment does not
+  unbook a shift.
+
+## [2026-08-27] create | repos/hyperview-footer-safe-area.md
+- Recipe for localizing a "CTA under the Android system nav bar" report without a device: grep the
+  on-screen copy through templates plus the locale catalogs, follow the screen's footer include, and
+  check for the missing bottom `safe_area` in the XML and HXPY variants.
+- Diffing against the working sibling footer in the same flow both proves the cause and gives the
+  fix shape; copy-pasted success/failure footer variants share the defect.
+
+## [2026-08-27] update | workflows/asana-bug-report.md
+- Device-console crops are only stable while the console layout holds still; panel hovers and
+  device-info flyouts shift the device rectangle, so verify the crop at both ends of the trim window.
+- Text covered by a translucent overlay is destroyed by the screen-share encode; recover the exact
+  label from the source template instead of upscaling or contrast tricks.
+
+## [2026-08-27] update | SCHEMA.md
+- Clarified that the wiki is the workspace-root one; repo-local `wiki/` directories are unrelated and never a capture target.
+
+## [2026-08-27] create | workflows/qa-platform-pre-grooming.md
+- Pre-grooming prep for the QA Platform Planning board: confirm the quarter's owned milestones as the root set, recurse into delegated descendants, overlay the last 1–2 weeks of meeting decisions, and propose keep/defer/split/drop plus sequencing in chat.
+- Ownership is a union of creator, assignee, and umbrella parent chain; a single assignee query drops most of the tree.
+
+## [2026-08-26] create | repos/instawork-mobile-e2e-shared-pythonpath.md
+- Local Docker compose PYTHONPATH is instatest-only; CI prepends e2e/mobile. `shared` imports in modules loaded before environment.py's sys.path insert fail only on the VSCode docker debug path.
+
+## [2026-08-26] update | workflows/mobile-android-login-local.md
+- Added gotcha for ModuleNotFoundError: No module named 'shared' on the local docker debug launch.
+
+## [2026-08-26] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Logcat `ReactNoCrashSoftException` on `deleteView` is the non-fatal sibling of the `updateOverflowInset` `RetryableMountingLayerException` crash.
+
+## [2026-08-26] update | repos/mobile-abilities-verify-now-flow.md
+- Repeatable Verify Now loop: mint fresh ABILITIES GigRequirements via POST /gig-requirements instead of hunting unanswered stock ones; shift-groups support DELETE for cleanup.
+
+## [2026-08-26] update | repos/mobile-abilities-verify-now-flow.md
+- After Verify Now completes, v2 cannot reset qualification/log; re-seed a new gig with a different unanswered ability.
+
+## [2026-08-26] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Native Android crashes often have no `react_native_version` on the event; Discover and issue-detail payloads omit that context. Use the app git tag.
+
+## [2026-08-26] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Prove store RN from the app git tag, not a stale local checkout.
+- Android native `sdk.version` can be 8.50.1 while the JS package is 8.21.0; store 8.x is expected after the RN 0.86 ship.
+- `RetryableMountingLayerException` in `updateOverflowInset` is still present on 0.86.2; the pick is in 0.86.3.
+
+## [2026-08-26] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- Added a mandatory confirmation gate: after generating the run plan and Slack commands, explicitly ask for approval before triggering any run.
+
+## [2026-08-26] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- Simplified Slack command guidance to production usage only by removing `/run_test_dev` direction.
+
+## [2026-08-26] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- Added Slack `/run_test` command generation guidance to the workflow: production vs dev command
+  selection, allowed `mobile-tests-*` parameter family, quoting rules, common command templates,
+  and required "Slack commands" output section.
+
+## [2026-08-26] update | index.md
+- Registered a new workflow page for PR/branch-based mobile test impact planning and bumped index
+  date/page count.
+
+## [2026-08-26] create | workflows/mobile-test-impact-from-pr-or-branch.md
+- Added a workflow that takes a PR or branch diff, classifies impacted mobile surfaces, selects
+  applicant/business/both scope, maps risk to targeted vs smoke vs full regression depth, and
+  returns an explicit run plan with estimated counts.
+
+## [2026-08-26] update | workflows/self-review-workflow.md
+- Expanded the workflow to include the `/personal-code-review` process content: babysit + review
+  passes, selector/page-object/native-picker/Instatest checks, dead-code and constants checks, PR
+  description structure, and a full review checklist with the required findings table output.
+
+## [2026-08-25] update | repos/mobile-step-definition-conventions.md
+- Do not use hasattr before getattr on @element descriptors: hasattr swallows
+  AttributeError and WebDriverException, so a typed except after it never runs.
+
+## [2026-08-25] update | workflows/self-review-workflow.md
+- Exception-narrowing reviews must trace helper suppression and nullable returns; guard return values
+  and fix deterministic errors at their source instead of widening catches.
+
+## [2026-08-25] update | preferences/global.md
+- For driver lookup/stale/missing-element misses, catch WebDriverException rather
+  than listing ElementLookupException, NoSuchElementException, or StaleElementReferenceException.
+
+## [2026-08-25] update | preferences/global.md
+- Personal code review: keep existing try/except around optional UI; narrow the
+  exception type instead of deleting the block.
+
+## [2026-08-25] update | preferences/global.md, workflows/self-review-workflow.md
+- Personal code review holds a best practices mindset: passing CI or absence of bugs is not enough.
+
+## [2026-08-25] update | tooling/asana-api-cloud-agents.md
+- Task descriptions are a single field: writing plain `notes` overwrites the rendered body, so
+  headers, tables, and code blocks flatten. Edit formatted descriptions via `html_notes` only.
+- No revision history to recover from: `stories` record that the description changed, not its old
+  body. Rebuild structure from a sibling task in the same family, then re-apply as `html_notes`.
+- `html_notes` XML rules: single `<body>` root, allowed tags only, `<br/>` in table cells is
+  rejected (use a newline); `<a data-asana-gid="..."/>` is enough for a task mention.
+
+## [2026-08-25] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Do not OR `sdk.version:1.6.1` into the RN-upgrade filter: that is an old Sentry SDK on
+  ancient App Store builds, not `@sentry/react-native` 8.21.0.
+
+## [2026-08-21] update | repos/mobile-step-definition-conventions.md
+- Added how to pick regression coverage after moving a shared step: three independent
+  failure modes (matcher/import dry-run, Gherkin-using features including optional
+  captures, Python-wrapper features), plus iOS for platform-branched helpers.
+
+## [2026-08-21] update | preferences/global.md
+- Added: never silence a linter with an inline suppression comment; fix the underlying cause
+  even when it means a wider refactor, and read a needed suppression as evidence of a real
+  structural problem.
+
+## [2026-08-21] update | repos/mobile-step-definition-conventions.md
+- Tightened the mid-file-import gotcha: a mid-file import and any suppression protecting it
+  from being hoisted are symptoms, so attack the cycle before documenting the workaround.
+- Added the cycle-removal method: enumerate what each side uses from the other; cycles
+  usually hinge on one generic symbol mis-homed in a feature module (widespread aliasing at
+  import sites is the tell). Relocate it to the shared module, rename around sibling name
+  collisions, and verify with an AST intra-package import-graph cycle check rather than a
+  runtime import.
+
+## [2026-08-21] update | repos/mobile-step-definition-conventions.md
+- Verified against the pinned fork (instawork/behave-parallel, 1.2.7.dev0), not PyPI behave:
+  matcher is a process-global bound at `@step` decoration time; reset happens only between
+  top-level step files, not around imports; default comes from environment.py (cfparse), so
+  a missing call fails silently. Invariant: set the matcher after all imports, before the
+  first `@step`. Mid-file imports forced by cycles need their own restore. `register_type`
+  is matcher-sensitive too. Noted the read-the-fork trap for future matcher questions.
+- Added the parse->regex conversion check: `"re"` is SimplifiedRegexMatcher (`^...$`), so
+  replay real feature lines against the anchored pattern; non-matching lines are usually
+  owned by a longer step definition elsewhere.
+
+## [2026-08-20] update | tooling/circleci-api-cloud-agents.md, tooling/circleci-api-job-logs.md
+- Local zprofile token is `CIRCLECI_TOKEN`, not `CIRCLECI_API_TOKEN`. Grep both names, then
+  send it as `Circle-Token`.
+
+## [2026-08-20] update | workflows/asana-bug-report.md
+- Transcription needs no local install: `uvx --from openai-whisper whisper` on a 16k mono wav.
+- Recordings of remote-device web consoles: crop stills and trimmed clips to the device screen
+  rectangle and upscale, so the ticket shows product UI instead of browser chrome and log panes.
+- Pixel-level layout claims (overlap, clipping, spacing) need a tight 3–6x zoom before deciding.
+
+## [2026-08-19] update | workflows/self-review-workflow.md
+- Do not treat debugger-session Behave step timings as runtime cost when reviewing waits.
+
+## [2026-08-19] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Resolve CI short SHAs with GitHub commit + pulls APIs, not only local `git fetch origin`.
+  `compare/branch...sha` with ahead>0 and behind=0 means soup on top of the branch, not in it.
+- Sentry `mechanism` is not the `handled` flag: `onunhandledrejection` can still be `handled: yes`.
+  Read per-issue tag distributions (and `error.handled` in Discover) instead of the latest event.
+- Transitive native modules are never autolinked; they stay dormant until some package requires
+  their JS entry point.
+
+## [2026-08-19] update | preferences/documentation.md
+- Fast-approved Confluence decision-page pattern: answer in one sentence, ticket link, how
+  numbers were measured, full inventory tables, split meaning vs action, short delivery list,
+  warn only on the exception, no PR/CI-YAML framing.
+
+## [2026-08-19] update | workflows/qa-story-pointing.md
+- Default: most tasks are agent-executed; point with a startup mindset and keep scores low.
+  Score human decision, review, and residual risk, not file count or mechanical volume.
+  Prefer 1–3; 5 is rare; 8+ still means split.
+
+## [2026-08-19] update | workflows/task-definition-readiness.md
+- Estimate section now points at qa-story-pointing for the agentic/startup default.
+
+## [2026-08-19] update | preferences/global.md
+- Pointing: Always assume agent-executed + startup mindset; keep scores low. Replaced the
+  earlier Do/instead-of wording.
+
+## [2026-08-17] update | workflows/asana-bug-report.md
+- Added Backend SHA from health_check: curl each env's `/internal/health_check` and take `sha`.
+  Table covers Staging (`admin.staging2`), QA, Demo, Production (`admin`/`app`), Local. Agents
+  should fetch the SHA when the env is known instead of leaving Unknown or asking the user.
+- Also noted: no whitespace between `</h2>` and section body (Asana renders a blank line).
+
+## [2026-08-17] update | workflows/asana-bug-report.md
+- Bug bodies must carry exactly the template sections, no more and no less. Removed the earlier
+  "optional iOS vs Android comparison table" advice: extra sections/tables get rejected on review
+  even when correct. Platform differences go in Description / Actual Result prose plus the OS and
+  App version(s) Details rows.
+
+## [2026-08-16] update | preferences/global.md
+- Record that task-description sections must have an empty line between them.
+
+## [2026-08-16] update | preferences/global.md
+- Record that task-description section headers must be bold.
+
+## [2026-08-16] update | preferences/global.md
+- Record startup-oriented sizing: for agent-executed work, points represent human decision, review,
+  and residual risk rather than bulk mechanical edits.
+
+## [2026-08-16] update | workflows/task-definition-readiness.md
+- Added an Estimate section rule: include story points and a one-sentence rationale.
+
+## [2026-08-16] update | workflows/task-definition-readiness.md
+- Require reading target code, configuration, dependencies, command runner, and CI before drafting
+  an implementation task.
+
+## [2026-08-16] update | workflows/task-definition-readiness.md
+- Clarified that a task with a `Do` section should not repeat it as `Done when` unless a distinct
+  release gate remains.
+
+## [2026-08-16] create | workflows/task-definition-readiness.md
+- Added a pre-draft evidence check and a post-draft readiness check for implementation tasks.
+- Designated ordered `Do` actions as the single source of truth to avoid duplicated completion criteria.
+
+## [2026-08-16] update | index.md
+- Registered `workflows/task-definition-readiness.md`; page count 39 → 40.
+
+## [2026-08-14] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Confirmed react_native_version is context-only (not searchable). Prefer
+  `environment:beta release:*-ci-*` / SHA-specific release wildcards; optional future tag.
+
+## [2026-08-14] create | tooling/sentry-mobile-rn-upgrade-filter.md
+- Recipe for filtering applicant/business Sentry during RN upgrade soup merges: prefer React
+  Native Version over release/appVersion+buildNumber; scope automation/beta; verify tag vs
+  context searchability; note MCP needs auth token.
+
+## [2026-08-14] update | index.md
+- Registered `tooling/sentry-mobile-rn-upgrade-filter.md`; page count 38 → 39.
+
+## [2026-08-14] update | workflows/asana-bug-report.md
+- Reviewer feedback: for toast/overlay bugs, state interactable vs stuck and what clears the UI.
+  Attach device logs as `.txt` only (no console screenshots; they are not agent-searchable and
+  steal the board preview).
+
+## [2026-08-14] update | workflows/asana-bug-report.md
+- Added video analysis pipeline (English): 1 fps frame slice, local Whisper transcript with
+  timestamps, reason over transcript then open only relevant stills, one ticket per bug, always
+  attach a trimmed clip (not the full long recording). Silent-recording fallback noted.
+
+## [2026-08-14] update | workflows/asana-bug-report.md
+- Rewrote into an end-to-end checklist from a real filing: evidence collection (env/SHA/app
+  version/recording), resolve+instantiate live template, Investigate section, custom fields from
+  live task, upload then embed/link attachments, template-exact html_notes (strong headings,
+  Details/Screenshots tables, no p/br), recording frame sampling, and device-log caution.
+
+## [2026-08-14] update | workflows/asana-bug-report.md
+- Added attachment-in-body recipe: embed inline images with `<img data-asana-gid=...>` (works in
+  table cells; Asana expands to src+thumbnail) and link non-renderable files (video) via
+  get_asset?asset_id=<gid>. List attachments to get GIDs first.
+
+## [2026-08-14] update | workflows/asana-bug-report.md
+- Corrected html_notes gotcha: `<table>` IS supported via REST (template uses it for Details and
+  Screenshots); only `<p>` is rejected. Added rule to match template section names/order and
+  strong-wrapped headings exactly. MCP allowed-element list omits table but REST accepts it.
+
+## [2026-08-14] update | workflows/asana-bug-report.md
+- Added attachment REST recipe, frame-sampling note for recordings, and html_notes gotcha.
+
+## [2026-08-14] update | workflows/asana-bug-report.md
+- Hard rules: always Bugs board; always resolve/fetch New Bug Report via API each filing (no
+  cached template GID/body). Reframed fill steps around the live instantiated task.
+
+## [2026-08-14] update | preferences/global.md
+- Added: when filing product bugs in Asana, use Bugs board and resolve live template via API each
+  time (never reuse cached template body or GID).
+
+## [2026-08-14] create | workflows/asana-bug-report.md
+- Started bug-filing runbook: Bugs project + New Bug Report template IDs, Investigate default
+  section, REST instantiate (MCP cannot), template body checklist. Marked living draft for
+  evidence-collection recipes.
+
+## [2026-08-14] update | index.md
+- Registered `workflows/asana-bug-report.md`; page count 37 → 38.
+
+## [2026-08-14] update | tooling/asana-api-cloud-agents.md
+- Corrected PAT env var to `ASANA_ACCESS_TOKEN` (not `ASANA_API_TOKEN`). Added recipe to list
+  project task templates and instantiate from a template; noted tasks do not carry source
+  template GID so match by project template name.
+
+## [2026-08-13] update | index.md
+- Added `workflows/self-review-workflow.md` to the workflow catalog and bumped the page count/date.
+
+## [2026-08-13] create | workflows/self-review-workflow.md
+- Added a self-review runbook that requires running `/personal-code-review` and reporting fix items
+  in a numbered evidence-backed table.
+
+## [2026-08-13] update | tooling/mobile-rn-upgrade-locator-defect-signature.md
+- Gotcha: a blank content area under correctly rendered chrome (title bar, inputs, carried-over
+  state) exonerates navigation and the server round trip; check for a missing empty-state slot in
+  the server-driven list before blaming the client, and treat hardcoded seed/default content as
+  zero evidence that the backing search index has data in that environment.
+
+## [2026-08-13] update | workflows/mobile-ios-localhost-automation-build.md
+- Gotcha: authenticated deep links carry the harness backend URL to the app, and a container-only
+  host alias is unreachable and ATS-blocked from the iOS simulator while Android is insulated by
+  reverse port forwarding plus warm intent delivery. Added the recognition signature (error view,
+  no backend log entry, no socket) and the three grounding checks (process launch args, persisted
+  override, backend access log), plus the leaked-Appium-session and duplicate-simulator traps.
+
+## [2026-08-12] update | repos/mobile-step-definition-conventions.md
+- Gotcha: Android Hyperview buttons can be visible but `clickable=false`; wait on native
+  clickable (not only Selenium enabled), put the helper in Instatest, prefer `.click()` over
+  coordinate taps, and document non-default timeouts.
+
+## [2026-08-11] create | repos/hyperview-local-mobile-sync.md
+- Captured the local Hyperview source watcher command for testing TypeScript changes in the mobile
+  app without publishing the package or reinstalling dependencies.
+
+## [2026-08-11] create | repos/mds-storybook-form-field-ids.md
+- Captured that MDS form_field stories reuse Django field name `field`, so every instance gets
+  `id_field`; unique, representative shell ids come from explicit widget `attrs["id"]`, not from
+  renaming the field (POST fixtures expect `field`).
+
+## [2026-08-11] update | tooling/appium-native-date-picker-locators.md
+- Clarified ownership: shared native picker selection belongs in the Instatest helper; screen
+  objects expose only app-owned trigger IDs and should not duplicate OS picker locators or steps.
+
+## [2026-08-11] update | preferences/global.md
+- Recorded the preference to avoid XPath selectors in mobile automation, using stable
+  accessibility IDs or OS-native selectors when a system control cannot expose one.
+
+## [2026-08-11] update | tooling/appium-native-date-picker-locators.md
+- Gotcha: the server-driven framework shares one bottom-sheet modal across its date and list
+  picker fields on iOS, with unidentified confirm/cancel buttons whose labels are per-element
+  attributes, so name/text lookups are ambiguous once two picker kinds coexist. Also recorded the
+  accepted resolution shape: document the exposure beside the locator code when no such screen
+  exists yet, instead of building scoping machinery for an impossible case.
+
+## [2026-08-10] update | tooling/github-pr-gh-cli-cloud-agents.md
+- Added the tree/blob comparison recipe for proving a subtree-style import contains every tracked
+  source file at its declared revision, plus the source-HEAD freshness check.
+
+## [2026-08-10] update | tooling/appium-native-date-picker-locators.md
+- Corrected an earlier same-day entry that was wrong: AOSP names the spinner wheels day/month/year,
+  but live page source shows the NumberPicker nodes with no resource id, even though sibling
+  internal ids surface. Lesson: framework layout source is not evidence an id reaches the
+  accessibility tree — dump page source first. Settled strategy is container-scoped enumeration
+  plus value-shape classification, symmetric across Android and iOS.
+
+## [2026-08-10] update | repos/mobile-step-definition-conventions.md
+- Gotcha: new Hyperview/template automation ids are not on current QA until deploy; do not
+  keep text/XPath fallbacks for pre-merge BrowserStack — validate id-only after QA serves
+  the template.
+
+## [2026-08-09] update | repos/mobile-native-datepicker-automation-ids.md
+- Cross-repo check: hyperview date-field wrappers also do not pass IDs into DateTimePicker;
+  createTestProps only tags the field shell. Confirmed same OS-locator strategy in instawork e2e.
+
+## [2026-08-09] create | repos/mobile-native-datepicker-automation-ids.md
+- Captured that native datetimepicker spinner wheels cannot get stable per-wheel app IDs on both
+  Android and iOS at the app layer alone; container `testID` only; OS locators + index is the
+  practical short-term path.
+
+## [2026-08-10] update | tooling/appium-native-date-picker-locators.md
+- Captured the accessibility tradeoff behind "just add ids to the wheels": the attribute that
+  makes a native wheel addressable is the one the screen reader speaks, and the widget can
+  overwrite it mid-interaction; the id-resource alternative instead risks saved-state
+  restoration.
+
+## [2026-08-09] update | tooling/appium-native-date-picker-locators.md
+- Corrected the blanket "per-wheel ids are impossible" claim: they are unreachable only while
+  the system picker renders the wheels, and swapping in an app-owned picker component is a
+  real (product-level) path. Added the recognition pattern for finding that escape hatch: an
+  existing screen using a JS picker library, plus a one-line re-export shim as the swap seam.
+
+## [2026-08-09] create | tooling/appium-native-date-picker-locators.md
+- Captured why OS-native date picker wheels cannot take app-owned per-wheel ids on either
+  platform, the value-based wheel classification pattern, and the trap that a library `testID`
+  advertised for automation may be a Detox view tag invisible to UiAutomator2.
+
+## [2026-08-05] update | tooling/browserstack-test-management-api.md
+- Added a BrowserStack project identifier quick-lookup section and documented the tested
+  test-plan clone workflow (new plan + linked run + copy run test cases).
+- Captured a compatibility fallback: if `update-test-cases` returns 404, use
+  `PATCH /test-runs/{id}/update` with `test_run.test_cases`.
+
+## [2026-08-03] update | workflows/mobile-browserstack-qa-docker.md
+- Documented that direct BrowserStack `docker compose run` commands must mount `<repo>/.git` to
+  `/workspace/.git` so step imports that call `git rev-parse --show-toplevel` do not fail.
+
+## [2026-08-03] update | repos/mobile-step-definition-conventions.md
+- Documented API-based feature-view setup for scenarios that depend on a viewed state.
+
+## [2026-08-03] update | preferences/global.md
+- Recorded the preference to keep work in the primary agent unless subagent delegation is explicitly requested.
+
+## [2026-08-03] update | workflows/mobile-browserstack-qa-docker.md
+- Added the local-backend readiness check required after recreating the backend for a BrowserStack
+  localhost run.
+
+## [2026-08-03] update | repos/mobile-step-definition-conventions.md
+- Captured PR review guidance: do not extract module-level `_*` helpers used from a
+  single `@step`; inline at the call site unless reused or the step body is genuinely
+  hard to scan.
+
+## [2026-07-31] update | repos/mobile-step-definition-conventions.md
+- Captured the mobile assertion rule: scope with stable accessibility IDs (or partial IDs
+  for dynamic segments), not XPath; add missing IDs in the backend-driven UI first.
+
+## [2026-07-31] update | workflows/mobile-browserstack-qa-docker.md
+- Captured that Android interactive BrowserStack debugging requires the scenario tag `@set_capability::interactiveDebugging=true` (commonly added temporarily to `@wip` scenarios).
+
+## [2026-07-30] update | workflows/mobile-browserstack-qa-docker.md
+- Clarified that BrowserStack runs must use the existing `BUILD_ID` from `e2e/mobile/.env`; for parallel runs, all launches reuse that same value.
+
+## [2026-07-30] update | workflows/mobile-browserstack-qa-docker.md
+- Documented parallel BrowserStack run grouping: reuse one BUILD_ID across all parallel runs and vary compose project names.
+
+## [2026-07-29] update | workflows/mobile-ios-localhost-automation-build.md
+- Added the missing local debug config export recovery for `ConfigLocal.get is not a function`.
+
+## [2026-07-29] update | workflows/mobile-ios-localhost-automation-build.md
+- Documented that the Automation configuration embeds JavaScript and does not connect to Metro, plus
+  the identity and environment tradeoff when switching to Debug.
+
+## [2026-07-28] update | WOKRSPACE-CATALOG.md
+- Added `hyperview` to the routing table and created a dedicated repo entry with purpose, scope, and
+  cross-repo handoff to `mobile`.
+
+## [2026-07-28] update | workflows/mobile-ios-localhost-automation-build.md
+- Added the exact Xcode setup that worked for local backend runs: `applicant_automation` scheme,
+  simulator selection, `-instaworkUrl http://localhost:8080`, plus Xcode clean build folder steps.
+
+## [2026-07-28] update | workflows/mobile-ios-localhost-automation-build.md
+- Added a gotcha for `PhaseScriptExecution Bundle React Native code and images`: inspect the first
+  underlying Metro/Babel `TransformError` in the full log and fix source parse errors before
+  continuing with pod/linker troubleshooting.
+
+## [2026-07-28] update | index.md
+- Added the new iOS localhost automation build workflow to the index and refreshed page count/date.
+
+## [2026-07-28] create | workflows/mobile-ios-localhost-automation-build.md
+- Captured the end-to-end local iOS automation rebuild flow: pod install location, simulator build,
+  artifact copy into `instawork/e2e/mobile/.../bin`, Appium 2 + xcuitest compatibility, and the
+  `CpHeader RCTAppDependencyProvider.h` recovery pattern.
+
+## [2026-07-21] update | preferences/global.md
+- Recorded the preference to show full verified file paths rather than ellipsis-truncated paths.
+
+## [2026-07-21] create | workflows/qa-story-pointing.md
+- Captured Instawork's QA story-point matrix (Fibonacci 1-13, time/effort/complexity/risk per
+  point) from the Confluence "QA Story Pointing" page, for future task sizing.
+
+## [2026-07-21] update | workflows/rice-prioritization.md
+- Clarified that internal RICE analyses must define one consistent opportunity unit for Reach.
+
+## [2026-07-21] update | workflows/rice-prioritization.md
+- Added standard impact and confidence scales, compact decision output, and non-comparable work handling.
+
+## [2026-07-21] create | workflows/rice-prioritization.md
+- Added an evidence-backed RICE scoring workflow for prioritizing initiatives.
+
+## [2026-07-16] update | repos/mobile-step-definition-conventions.md
+- Documented behave.ini `exclude_re` false positive: unanchored `deep_*` excludes feature files
+  whose names contain `deeplink`, yielding 0 selected scenarios with exit 0.
+
+## [2026-07-16] update | tooling/appium-mcp-browserstack-device-session.md
+- Captured iOS BrowserStack XCUITest lifecycle limits: `deep_link`, `clear`, and `background` are
+  unsupported via Appium MCP; use the Safari URL-bar deeplink flow (TabBarItemTitle → URL → Go) and
+  terminate the app between deeplinks when background is unavailable.
+
+## [2026-07-16] update | preferences/global.md
+- Recorded the preference to wait for explicit authorization before committing, pushing, merging, or changing a pull request's state.
+
+## [2026-07-13] update | repos/mobile-step-definition-conventions.md
+- Captured a reusable mobile locator rule: Android OEM camera/gallery UIs can change control labels
+  and open in landscape, so capture and confirm controls with locator unions instead of single-label
+  assumptions or portrait-only geometry.
+
+## [2026-07-07] update | repos/mobile-step-definition-conventions.md
+- Captured a reusable mobile-data-setup rule: shared shift-group creation steps should accept an
+  explicit worker type and set `w2_employees_only` intentionally, instead of relying on backend defaults.
+
+## [2026-07-06] update | tooling/appium-mcp-browserstack-device-session.md
+- Captured a mobile payment-row locator gotcha: live payment-list row ids may be opaque tokens
+  rather than numeric invoice ids from generated-data manifests, so locate by visible row content and
+  validate the target transaction inside Payment Details.
+
+## [2026-07-06] update | tooling/instawork-automation-api.md
+- Captured a v2 celery-runner invoice-payment gotcha: serializer-echoed invoice identifiers may not
+  be task-ready primary keys, so resolve the invoice inside the backend runtime from the transaction
+  or shift before calling payment tasks.
+
+## [2026-07-06] update | tooling/instawork-automation-api.md
+- Captured a Stage-2 mobile automation data-gate gotcha: legacy automation webhooks may exist for
+  a setup action, but if the orchestrator requires `/automation/api/v2/swagger` coverage, a
+  test-scoped missing v2 endpoint remains a blocker unless the run explicitly allows non-v2 helpers.
+
+## [2026-07-06] update | workflows/mobile-automation-pipeline.md
+- Captured mobile automation feature-file placement guidance: target roughly 5 scenarios per
+  feature file, but keep scenarios that must run sequentially together because Instatest runs
+  feature files in parallel in CI; shared mutable setup such as Constance flag updates is a
+  sequential-placement signal.
+
+## [2026-07-04] create | tooling/appium-mcp-browserstack-device-session.md
+- Captured Appium MCP + BrowserStack device-session gotchas from a live run: `appium_app_lifecycle`
+  `deep_link` requires the package `id` even though the schema implies it's optional; a fresh-install
+  admin-login deep link lands on a one-time welcome/congrats screen before the main app; the
+  applicant Profile tab's "My skills" section needs ~2 scrolls past Profile strength/Positions
+  before it renders; `scroll_to_element` can falsely report an element "already visible"; skill/
+  category rows expose full-label accessibility ids (name + count suffix).
+
+## [2026-07-03] update | tooling/instawork-automation-api.md
+- Corrected an over-eager Stage-2 blocker: API v2 has no Skill/PositionSkill endpoints (verified,
+  zero matches in the full swagger dump), but that's expected and not a data-fit failure — catalog
+  data like Skill/PositionSkill is pre-existing product config, not per-test data Stage 2 must
+  create. Recognition pattern: before treating a missing automation-API endpoint as a blocker, check
+  whether the entity is test-scoped data (blocker) or global/product config that already exists in
+  the target environment (not a blocker — resolve live during device session instead).
+
 ## [2026-07-01] update | preferences/documentation.md
 - Recorded the prose-writing preference: use `/writing-guidelines` before drafting or polishing
   emails, Slack replies, Markdown docs, PR descriptions, and similar prose.

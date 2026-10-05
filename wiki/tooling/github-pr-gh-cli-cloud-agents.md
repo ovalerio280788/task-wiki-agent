@@ -55,6 +55,19 @@ Verified 2026-06-23: created mobile#8538, edited test-automation#194 and mobile#
 posted a review reply on test-automation#194, all via `gh` after the PR tool returned
 `unauthenticated`.
 
+## Validating a repository import
+
+To verify a subtree-style import is complete, compare the declared source revision's Git tree to the
+target prefix by path, mode, and blob ID. This proves every tracked source entry is present with
+identical content without relying on a generated PR file list:
+
+```bash
+python3 -c 'import subprocess; source_repo="/path/to/source"; source="<source-sha>"; destination="<target-sha>"; parse=lambda cmd: {line.split("\t", 1)[1]: tuple(line.split("\t", 1)[0].split()) for line in subprocess.check_output(cmd, text=True).splitlines()}; source_tree=parse(["git", "-C", source_repo, "ls-tree", "-r", "-l", source]); target_raw=parse(["git", "ls-tree", "-r", "-l", destination, "lib/imported"]); target_tree={path.removeprefix("lib/imported/"): data for path, data in target_raw.items()}; print("missing:", sorted(set(source_tree) - set(target_tree))); print("extra:", sorted(set(target_tree) - set(source_tree))); print("mismatched:", sorted(path for path in set(source_tree) & set(target_tree) if source_tree[path] != target_tree[path]))'
+```
+
+Also compare the declared source revision against the source repository's default branch. A perfect
+tree match only establishes completeness at that revision, not at a newer source HEAD.
+
 ## Gotchas
 
 - **Try the PR tool first, fall back to `gh`.** Use the dedicated PR tool by default; switch to `gh`

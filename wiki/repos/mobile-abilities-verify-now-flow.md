@@ -1,7 +1,7 @@
 ---
 title: "mobile: ABILITIES Verify Now post-booking flow"
 area: repos/mobile
-updated: 2026-06-25
+updated: 2026-08-26
 ---
 
 # Mobile: ABILITIES "Verify Now" post-booking flow
@@ -57,6 +57,28 @@ After creation, verify:
 - Accepting that term satisfies the ABILITIES requirement immediately during booking.
 - The post-booking Verify Now flow checks if requirements are already verified — finds they are —
   and does not show the bottom sheet.
+
+## Re-show Verify Now after the worker already completed it
+
+Automation API v2 has no list/delete surface for the worker's ability qualification or per-gig
+verification log. Completing Verify Now writes both; either one hides the CTA.
+
+Do not reuse the same gig or the same already-answered ability. Same worker + same requirement
+stays hidden even on a brand new gig, and the stock ABILITIES catalog is small, so picking
+"another existing one" runs out after a few loops.
+
+Reliable loop, no re-login needed: mint **new** ABILITIES requirements, which no worker can have
+answered, and attach those.
+
+```bash
+# one per question wanted; unique name + pro_title
+curl -s -X POST https://qa.instawork.com/automation/api/v2/gig-requirements \
+  -H "Content-Type: application/json" \
+  -d '{"name": "<unique>", "description": "...", "category": "Abilities", "pro_title": "<question?>"}'
+```
+
+Then new shift group (`add_grooming_preset: false`) -> `add-requirement` per new id -> book.
+`DELETE /automation/api/v2/shift-groups/{id}` cleans up old attempts so Upcoming stays readable.
 
 ## Worker requirements
 

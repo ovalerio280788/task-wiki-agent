@@ -1,6 +1,6 @@
 ---
 title: Mobile Android login (Instatest) against local backend
-updated: 2026-06-30
+updated: 2026-09-29
 tags: [testing, mobile, emulator, docker, local, runbook]
 area: workflows
 ---
@@ -48,6 +48,15 @@ Run these in order before starting Instatest:
 
 5. **Automation APK present**:
    `mobile/applicant-app/bin/applicant-automation.apk`
+
+   The APK ships a baked `assets/index.android.bundle`, so local RN source edits are invisible
+   until it is rebuilt. Rebuild from `mobile/applicant-app` (~20 min, Gradle + native):
+   ```bash
+   yarn build:android:automation   # fastlane -> bundleAutomationRelease -> bin/applicant-automation.apk
+   ```
+   Then copy it to the e2e `bin/` path the runner reads and `adb install -r`. Confirm a new id
+   actually shipped by byte-searching the bundle inside the APK (`strings` misses it; the bundle
+   is not text): read `assets/index.android.bundle` from the zip and `.find(b"<your-id>")`.
 
 6. **`mobile/.env`** configured for local (see below).
 
@@ -160,6 +169,59 @@ flowchart LR
 
 ## Gotchas
 
+- **A `node_modules`-only change (yarn patch) does not invalidate the Gradle JS bundle task**, so
+  the "rebuilt" APK silently ships the previous bundle and the device shows the *old* ids. Verify
+  by extracting `assets/index.android.bundle` from the new and previous APKs and comparing md5:
+  identical means the bundle task was skipped. Force it by deleting
+  `android/app/build/generated/assets/react/<variant>` plus the matching
+  `intermediates/assets/<variant>` before rebuilding. Checking the APK timestamp is not enough —
+  the APK is always rewritten by bundletool even when the bundle inside is stale.
+- **Reverting a yarn patch with `git checkout` does not revert `node_modules`.** The patched file
+  keeps the edit, so a rebuild ships ids that no longer exist in any tracked file — and they look
+  like pre-existing app behavior in a UI dump. After touching `.yarn/patches`, run `yarn install`
+  and grep the installed file before building. Same for the reverse: when a UI dump shows an id
+  you cannot find in the source, check `node_modules` before concluding the app already had it.
+- **`adb shell uiautomator dump` exits 137 / writes no file while an Appium server is installed.**
+  A leftover `io.appium.uiautomator2.server` from a dead session still holds the accessibility
+  service. `adb shell am force-stop io.appium.uiautomator2.server` (and `.test`), then dump.
+- **The built automation APK always shows mtime `Jan 1 1981`.** It is produced from the AAB via
+  bundletool, which normalises zip timestamps, so `ls -l` makes a fresh artifact look ancient and
+  suggests the build silently no-opped. Confirm freshness with `stat -f %Sc` (ctime), not mtime.
+  There is also no `outputs/apk/automation*` dir to check: the gradle output is
+  `outputs/bundle/automationRelease`.
+- **`python -m instatest` cwd must be the app dir.** `FilePaths.DEFAULT_CONFIGURATION_PATH` is
+  `os.path.abspath("./configuration")` at import, so the process has to start in
+  `/workspace/applicant-app` (or `business-app`), not `/workspace` or `/workspace/e2e/mobile`.
+  Compose `working_dir` is `/workspace`; use `--workdir /workspace/applicant-app` or `cd` before
+  the python invocation. Config is `applicant-app/configuration/{devices,applications,providers}.json`.
+- **instawork `e2e/mobile` compose is not a git root.** Applicant `login_steps.py` runs
+  `git rev-parse --show-toplevel` at import. Mount the repo `.git` onto `/workspace/.git` or
+  step loading dies with exit 128 before any scenario runs:
+  `-v <repo>/.git:/workspace/.git:ro`.
+- **Launch compose from the repo root with an explicit `HOST_WORKSPACE`.** The compose file
+  sets `HOST_WORKSPACE=${PWD}`, and `${PWD}` is the shell cwd (the repo root), not
+  `e2e/mobile`. Appium then looks for
+  `<repo>/applicant-app/bin/applicant-automation.apk` and session create fails. Pass
+  `-e HOST_WORKSPACE="$(pwd)/e2e/mobile"` (the vscode `run-automation.sh` wrapper already
+  does this). `--name` is a Behave regex: `[25022]` is a character class and silently
+  skips; pass the digits only (`25022`).
+- **Next-session create can die after a long scenario.** Appium `createSession` may time out on
+  `adb shell settings put global hidden_api_policy*` (or later `uiautomator2ServerLaunchTimeout` /
+  Appium Settings not running). The next scenario then fails with `NoneType` has no
+  `implicitly_wait` / `set_location` / `is_app_installed`. Treat as a device/session flake: retry
+  the failed scenario alone; do not change locators. If retry still fails after a cold boot,
+  uninstall `io.appium.settings`, `io.appium.uiautomator2.server`, and
+  `io.appium.uiautomator2.server.test` on the emulator, then retry once more.
+- **`list` is not a leaf.** Bare `python -m instatest list` fails argparse (`subcommand, cargs`
+  required). Use `list devices`, `list applications`, or `list servers`.
+- **`list` has no `-v` / `-l`.** Those flags exist only on `instatest run`. Default
+  `LoggingOptions`: file `DEBUG` (`out/runtime.log` under cwd), console `INFO`, and a stdout
+  handler only when `VERBOSE=true|1`. `LOG_LEVEL` / `SUPER_DEBUG` raise console to DEBUG for
+  loggers created via `get_logger()`. `list_config` logs with stdlib `getLogger("instatest")`,
+  which never gets those handlers, so `log.debug` list lines are dropped unless that logger is
+  configured in-process (for example `logging.basicConfig(level=DEBUG)` in the same Python
+  process). An empty-looking successful `list` is expected at default levels.
+
 ### Troubleshooting playbook
 
 #### Appium not running
@@ -221,6 +283,14 @@ adb shell cat /sdcard/window_dump.xml | rg 'intro-screen/sign-in-button'
 
 Expect `content-desc="intro-screen/sign-in-button"`. If missing, fix emulator/network before Docker/Instatest.
 
+#### `NoneType` on `implicitly_wait` / `find_element` before the first step
+
+**Symptom:** before_scenario dies with `'NoneType' object has no attribute 'implicitly_wait'`. The launch step, screenshot, and teardown then fail the same way (`find_element`, `get_screenshot_as_png`, `is_app_installed`).
+
+**Cause:** the Appium session never started. Read the `WebDriverException` above that line. The usual one is host `adb install` of the automation APK exceeding `androidInstallTimeout` (90s). A "File path does not exist" version warning from inside the container can still appear when the APK exists on the host; Appium installs from the host path.
+
+**Check:** emulator `sys.boot_completed` is `1`, then install the APK from the host. A hung package manager on a booted emulator still times out. Cold-boot before raising the timeout.
+
 #### Emulator process dies silently within seconds of cold boot, no crash report
 
 **Symptom:** `qemu-system-aarch64` process starts, appears in `ps`, then vanishes within 5-15s.
@@ -274,6 +344,14 @@ If still missing, stop stale qemu and start a fresh AVD (see cold boot command a
 
 **Fix:** Update `mobile/.env` `BACKEND_URL` to `http://host.docker.internal:8080`. Re-source env or rely on docker-compose `env_file: .env`.
 
+#### `ModuleNotFoundError: No module named 'shared'`
+
+**Symptom:** VSCode docker debug launch dies during behave init, importing `testrail` / `shared.constants`. Preflight (backend, Appium, APK) all passed.
+
+**Cause:** Local compose `PYTHONPATH` is only `/workspace/lib/instatest`. CI prepends the e2e/mobile root. Applicant `environment.py` inserts that root into `sys.path` *after* it imports `testrail`, so `from shared...` inside `testrail.py` runs too early.
+
+**Fix:** not a local-setup step. See [mobile e2e shared PYTHONPATH](../repos/instawork-mobile-e2e-shared-pythonpath.md).
+
 #### 0 scenarios run
 
 **Symptom:** Exit 0 but nothing executed.
@@ -321,3 +399,4 @@ If still missing, stop stale qemu and start a fresh AVD (see cold boot command a
 
 - [web e2e local](./web-e2e-local.md)
 - [instawork automation API](../tooling/instawork-automation-api.md)
+- [local Android resource-id locator fix](mobile-android-resource-id-locator-fix.md)

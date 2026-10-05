@@ -1,6 +1,6 @@
 ---
 title: Mobile automation pipeline (BrowserStack → spec)
-updated: 2026-06-25
+updated: 2026-07-06
 tags: [testing, mobile, runbook, capability]
 area: workflows
 ---
@@ -73,6 +73,13 @@ Default mode is `supervised` (stops at each checkpoint). Override: `orchestratio
 - **Parallel layer subagents save the most time.** Sequential spawning of 5 agents is the biggest
   avoidable latency in this pipeline.
 - **Gate reviewers are also independent.** Multiple can run at once, cutting review loops.
+- **Feature file placement balances size and CI behavior.** Prefer at most 5 scenarios per
+  feature file, but keep scenarios that must run sequentially in the same feature file because
+  Instatest runs feature files in parallel in CI. Shared mutable setup, such as scenarios that
+  update the same Constance flag, is a reason to keep scenarios together because parallel feature
+  files can make the automation run flaky. When adding a scenario, search nearby feature files for
+  overlapping tags/navigation/steps, choose the smallest fitting existing file when practical, and
+  document the placement rationale.
 - **BrowserStack "Cannot Automate" custom field is often stale.** Evaluate automateability from
   the trace independently; don't let this field block the pipeline.
 - **tracing-feature-flows: surface discovery must run first, alone.** The skill explicitly forbids

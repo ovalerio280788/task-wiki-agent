@@ -1,5 +1,14 @@
 workspace/repo-paths.local.json
 airflow/
+ai-manual-tester/
 config-sync/
 instawork/
+instawork_2/
+instawork_3/
+hyperview/
 mobile/
+test-automation/
+serverless/
+.DS_Store
+# Local CI / Allure evidence for canvases (do not commit PNGs)
+artifacts/

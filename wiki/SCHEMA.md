@@ -32,6 +32,9 @@ Preferences section below).
 Pick the folder by the nature of the learning, not by which repo you happened to be in. A learning
 about the AWS CLI goes in `tooling/` even if you discovered it while working in `infrastructure/`.
 
+This wiki is the one at the workspace root, alongside the repo folders. Some repos contain their
+own `wiki/` directory; those are unrelated and are never the target of a capture.
+
 ## Page format
 
 Plain markdown, agent-first. One topic per page. Small and scannable (aim under ~150 lines).

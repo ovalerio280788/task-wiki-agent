@@ -1,6 +1,6 @@
 ---
 title: Granola MCP bulk transcript export
-updated: 2026-06-29
+updated: 2026-09-29
 tags: [tooling, capability, gotcha, data]
 area: tooling
 ---
@@ -14,13 +14,11 @@ which account is connected.
 
 ## What works
 
-- Build the index with one `list_meetings` call using `time_range: "custom"` and a wide
-  `custom_start`/`custom_end`. It returns id, title, date, and participants per meeting.
-- The index response is capped at roughly 138 meetings (about 44 KB). If your real history is
-  longer than the cap, page backward with narrower windows (about 6 weeks each) until empty.
-- Detect where history actually begins by probing far-back narrow windows. Granola only has data
-  from the adoption date forward; everything before returns `count="0"`. So a single wide call can
-  already be complete when adoption was recent.
+- Build the index with `list_meetings`. The live schema accepts only `this_week`,
+  `last_week`, or `last_30_days`. It returns id, title, date, and participants per meeting.
+  For the content of a named meeting, follow with `get_meetings` or `query_granola_meetings`.
+- The index response is capped at roughly 138 meetings (about 44 KB), and `list_meetings` cannot
+  page earlier than `last_30_days`. For a specific older discussion, use `query_granola_meetings`.
 - Transcript speaker labels are fixed: `Me:` is always the connected account owner, `Them:` is
   every other speaker (not individualized by name). Filter on `Me:` for the owner's own words.
 - For bulk pull, split meeting ids into batch files and hand each batch to a subagent that loops
@@ -37,7 +35,9 @@ which account is connected.
 - No local bypass. The desktop cache `~/Library/Application Support/Granola/granola.db` is encrypted
   (`sqlite3` reports "file is not a database"), and `cache-v6.json.enc` is encrypted too. The MCP is
   the only practical extraction path.
-- `custom_start` earlier than the real first meeting is silently clamped; `custom_end` is honored.
+- `list_meetings` rejects `time_range: "custom"` (and `custom_start` / `custom_end`) even
+  though older notes describe that window. Do not retry the same call. Use `last_30_days`,
+  then `query_granola_meetings` for a specific discussion.
 - For the mechanical fetch-to-disk step a fast model (composer) is cheaper than a thinking model,
   but the throughput ceiling is the MCP rate cap, not the model.
 
