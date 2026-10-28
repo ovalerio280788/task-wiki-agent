@@ -94,4 +94,4 @@ Default mode is `supervised` (stops at each checkpoint). Override: `orchestratio
 
 - [BrowserStack Test Management API](../tooling/browserstack-test-management-api.md) — API details, URL→id mapping
 - [Asana API on cloud agents](../tooling/asana-api-cloud-agents.md) — token loading
-- [Mobile BrowserStack QA Docker](mobile-browserstack-qa-docker.md) — if running the test after implementation
+- [Run mobile BrowserStack tests from the e2e env file with Docker](mobile-browserstack-qa-docker.md) — if running the test after implementation

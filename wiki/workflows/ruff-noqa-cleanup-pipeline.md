@@ -1,6 +1,6 @@
 ---
 title: Ruff noqa cleanup pipeline
-updated: 2026-09-30
+updated: 2026-10-05
 tags: [testing, ci, runbook]
 area: workflows
 ---
@@ -44,6 +44,11 @@ touched the other tree.
 - A multi-code noqa must keep the codes this task does not own.
 - I001 / F401 were grandfathered on purpose during gate-enable. This pipeline is allowed to
   `--fix` them.
+- An F401 or “unused module” hit inside `lib/instatest` can still be the import path that
+  `e2e/mobile` step files use. Ruff scoped to `lib/instatest` will not see those. Before
+  deleting a re-export or module, grep `e2e/mobile` for that import path. Behave loads every
+  step module before any scenario, so a missing import fails the job at startup and the
+  later Allure steps fail only because there are no results.
 - Leftover F403/F405 star-import rewrites can explode the diff; stop those two and fail the task
   for a human split.
 - A clean `git diff` that touches both `e2e/mobile` and `lib/instatest` is a scope bug. Fail

@@ -5,6 +5,458 @@
 > When adding an entry, insert it directly below this header, above the previous newest entry.
 > Rotate when this file exceeds ~500 entries or at year end: rename to `log-YYYY.md` and start fresh.
 
+## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md
+- Pass `-e BACKEND_INSTANCE=online_qa_server`. Compose interpolates that key from `e2e/mobile/.env`, so `online_demo_server` still calls `demo-1234.instawork.com` when only `BACKEND_URL` is overridden. `browserstack.timezone` is always sent and a plan without that capability never opens a session.
+
+## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md
+- Pass `++processes` and `++parallel-element` as separate `--behave-args` tokens. One quoted string is a single argument and behave exits unrecognized before upload.
+
+## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md
+- Run preflight on every BrowserStack launch, including a repeat. Run the tests with `docker compose -p mobile`. Pass `-e BUILD_ID` on that compose run so preflight's dated `.env` value is not the session build.
+
+## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md
+- Fast start: read app ids and devices from `.env`, skip upload and preflight, one build id per feature per OS, at most 10 parallel scenarios. Preflight rewrites `BUILD_ID` to today's date, so a repeat run must pass `-e BUILD_ID` instead.
+
+## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md
+- After a `--rm` BrowserStack run, score the JUnit file under `e2e/mobile/<app>/out/reports/`. The mobile-repo reports path is not this tree.
+
+## [2026-10-28] update | repos/mobile-step-definition-conventions.md
+- A missing step is Behave Broken with an unimplemented-step snippet, before any assertion. Grep feature files for the phrase; a Background migration can leave the same lines copied inside one scenario.
+
+## [2026-10-27] update | workflows/mobile-browserstack-qa-docker.md
+- Scenario parallelism needs `++processes` because `+` is rewritten to `-` once. Select specific scenarios with an `@` list of `file.feature:LINE` paths. `@broken` and line-skipped scenarios do not open a BrowserStack session.
+
+## [2026-10-27] update | tooling/cursor-canvas-authoring.md
+- Every canvas table starts with a `#` column. Row numbers stay tied to the full list when a filter hides rows.
+
+## [2026-10-27] update | preferences/global.md
+- Canvas tables always lead with a `#` column of 1-based row numbers.
+
+## [2026-10-27] update | repos/mobile-e2e-endpoint-coverage.md
+- No command rewrites a coverage mapping after a rename. Reconcile only deletes files whose names match no current scenario. A title-only change updates the label and renames the file; re-collect when the requests changed.
+
+## [2026-10-27] create | repos/mobile-e2e-endpoint-coverage.md
+- A renamed Gherkin scenario leaves committed endpoint-coverage YAML stale. Update the label and rename the file; the same validator fails both coverage CI jobs.
+
+## [2026-10-28] update | tooling/instawork-automation-api.md
+- Treat `CurrentTest.api_v2_data` as a client-side ledger: creating a business with a company name does not add that company to the ledger for later setup steps.
+
+## [2026-10-27] update | repos/e2e-constance-parallel-race.md
+- A shared catalog delete races the same way as a global config write, including when a missing row counts as success. Accept the latest live row per user. Latest is the highest live id, not the newest created row, and a not-live row does not count.
+
+## [2026-10-27] update | workflows/mobile-browserstack-qa-docker.md
+- BrowserStack API scoring should use the e2e `.env` pair. The shell profile username may not be exported, and its access key can 401 while `.env` works. macOS `urllib` needs certifi for that host.
+
+## [2026-10-27] update | workflows/mobile-browserstack-qa-docker.md
+- Scenario-level parallelism is already in behave-parallel. Instatest appends `--parallel-element feature` after user behave args, so `--threads` cannot be overridden. Omit `--threads` and pass `+processes` plus `+parallel-element scenario`, with `MULTI_THREAD=YES`, only when the BrowserStack app id is already set. `@serial` keeps a feature on one worker. Scenario mode reruns `before_feature` per scenario.
+
+## [2026-10-27] update | tooling/instawork-automation-api.md
+- The offset belongs on the shared shift format. Naive datetimes still omit it, so those callers stay on the Pacific default.
+
+## [2026-10-27] update | tooling/instawork-automation-api.md
+- When a shared shift step must keep naive timestamps, put the place in Pacific instead of adding an offset to that step.
+
+## [2026-10-27] update | tooling/instawork-automation-api.md
+- Shift timestamps with no offset are parsed as Pacific on an unauthenticated automation call. A non-Pacific place needs the offset on the string, or the stored window slides and clock-out records no payable time.
+
+## [2026-10-27] update | tooling/hyperview-stale-press-handler.md
+- A recording alone proves the press never ran: with `show-during-load`/`hide-during-load` on the behavior, count distinct renderings of the button region across the whole wait. One rendering means the behavior never fired, separating a lost press from a failed request with no network log.
+- Rule out a disabled touchable first; a button exposing only `label` and `label_loading` cannot be inert for that reason.
+- An inline-edit save on the same screen ("Saving…" then new derived values) is a document replacement, so the next press on any reused touchable is exposed.
+
+## [2026-10-27] update | tooling/ios-visible-false-under-transparent-overlay.md
+- Corrected the previous entry: the Android inert-press failure on the same screen is a *different* defect, not the sheet swallowing the tap. Decide between them from before/after values; a single end-of-run screenshot has no baseline, so "the value never changed" is not readable from it.
+
+## [2026-10-27] update | tooling/ios-visible-false-under-transparent-overlay.md
+- An unclosed selection bottom sheet emits both platform signatures at once: iOS asserts the primary button "not visible", Android clicks it successfully and the screen never advances. Check whether the preceding selection step closed the sheet before treating them as two bugs.
+- A generic fixed-fraction "refresh" swipe is not a sheet-dismiss fallback; it usually starts on the backdrop above the sheet.
+
+## [2026-10-27] update | tooling/allure-testops-screenshots.md
+- Broadened from screenshots to TestOps failure artifacts: find the result via `/api/testresult?launchId=`, read the ordered step tree from `/execution`, and prefer the `step_retry_summary` and `API Call Timeline` attachments over the screenshot alone.
+- `rql`/`name` params are ignored on `/api/testresult` and `launchId` is required, so a filtered-looking request silently returns the whole page.
+- The token sits in `~/.zprofile` as `TESTOPOS_TOKEN`; a missing `testops_*` tool means a missing token, not a missing MCP server.
+- Compare a repeating scenario's non-pass rate against a sibling that runs the block once to tell compounding per-block risk from a regression.
+
+## [2026-10-27] update | tooling/redshift-allure-ops.md
+- `scenarios.id` is the TestOps test result id, so the warehouse covers history and the API covers one run's steps.
+- The step tables stay unusable even when scoped to the run's own time window; `name LIKE '%<n>]%'` is required because `test_case_id` collides with bracketed titles, and runs duplicate rows so count distinct `launch_id`.
+
+## [2026-10-26] update | workflows/instawork-local-hiring-opensearch-setup.md
+- Local Recruitics readiness is five steps: OpenSearch, Kafka topics plus consumer restart, the feed URL and both sync flags, then two posts to the readiness endpoint.
+
+## [2026-10-26] update | workflows/instawork-local-hiring-opensearch-setup.md
+- Local Recruitics ingest uses the QA feed URL in `RECRUITICS_JOB_SYNC_URL`, plus `ENABLE_HIRING_JOBS_SYNC` and `ENABLE_RECRUITICS_JOBS_SYNC`, before the sync script.
+- Local Recruitics ingest is the Kafka consumer, and compose does not create `instawork.shared_message_bus_tasks`. Run `check_and_create_kafka_topics` and restart the consumer before the sync.
+
+## [2026-10-27] update | repos/e2e-constance-parallel-race.md
+- Gig details shows the company name, so a new place can hang off the existing company. The business needs its own name. The distance check uses that place's coordinates, so the GPS tag has to match them.
+
+## [2026-10-26] update | repos/e2e-constance-parallel-race.md
+- When business create ignores subsidiary, pick a place in a W-2-only state that is already on the wanted side of the other list. The state forces W-2, so the subsidiary write is unnecessary.
+
+## [2026-10-26] update | repos/e2e-constance-parallel-race.md
+- Businesses POST documents subsidiary as writable, but the custom create drops it and the factory stamps the 1099 subsidiary. Deleting the row and posting again does not change that.
+
+## [2026-10-26] update | repos/e2e-constance-parallel-race.md
+- A W-2 shift outside the W-2-only state list needs the subsidiary on create. The businesses detail route is retrieve and delete only, so get-or-create by name cannot update an existing row. Use a new name, or delete and create again.
+
+## [2026-10-26] update | repos/e2e-constance-parallel-race.md
+- A W-2 shift outside the W-2-only state list needs the business subsidiary set to a W-2 subsidiary. Get-or-create by name keeps the old subsidiary, so patch the existing row.
+
+## [2026-10-26] create | tooling/hyperview-stale-press-handler.md
+- First press after a document update fires the previous element's href because the press handlers are built from a behavior cache that only refreshes in `componentDidUpdate`, one commit late. Label is already correct, so the screen looks right.
+- Recognition pair: a long wait never helps, but navigating away and back does. That rules out load races and points at a committed React closure.
+- Instance reuse (positional keys), no intervening re-render, and the concurrent root all have to hold; the middle one is the intermittency lever.
+
+## [2026-10-26] update | repos/e2e-constance-parallel-race.md
+- A list-valued key may be matched against the shift's business place, not the worker profile. Do not patch the shared place. Append a second place whose state is already on the wanted side, with its own company and business, before the step that reads `businesses[-1]`. Override `google_place_id` on create or the SF default comes back. Point `@gps_` at that place: "close to location" is a geofence around the gig.
+
+## [2026-10-26] update | repos/e2e-constance-parallel-race.md
+- Do not change the reader to absorb a JSON fraction. Leave the fraction out of the override metadata so the existing decimal config value is used. Integers in that metadata are exact.
+
+## [2026-10-26] update | tooling/browserstack-failure-triage.md
+- The `/networklogs` HAR includes response bodies, so a 200 rendering the wrong copy is provable by grepping the body for the asserted string.
+
+## [2026-10-26] update | repos/e2e-constance-parallel-race.md
+- The race also runs across launches: each platform is its own CI pipeline hitting the same shared backend, so collocating scenarios in one feature file does not fix it.
+- Detect by self-joining Allure scenario results on overlapping windows across different launch ids and comparing non-passed rates; confirm with symmetric HAR bodies.
+- Prefer per-entity test data over any global write: a per-worker override record whose metadata carries the same keys, or an entity attribute that already sits on the wanted side of a list-valued key.
+- A displayed value may be recomputed at render time from live config, so the exclusive window must cover the assertions, not just setup. `::after` restores a hardcoded literal, not the captured prior value.
+
+## [2026-10-23] create | tooling/captain-tooling-shared-business.md
+- Captain scenarios that get-or-create one business adopt each other's overlapping shifts. A roster larger than this scenario's workers, then Forbidden "The shift has been cancelled.", is the other scenario's teardown.
+
+## [2026-10-23] update | workflows/mobile-browserstack-qa-docker.md
+- Parallel containers that share the bind-mounted tree can corrupt `__pycache__` and exit before a session starts. Set `PYTHONDONTWRITEBYTECODE=1` and clear leftover cache directories first.
+
+## [2026-10-23] update | tooling/ios-visible-false-under-transparent-overlay.md
+- Android header controls stay displayed under a root toast top sheet. A successful click dismisses the toast and never reaches the control. The sheet stays up for 3 seconds.
+
+## [2026-10-23] update | workflows/refresh-browserstack-env-app-ids.md
+- `instawork` and `instawork_2` each have their own `e2e/mobile/.env`. Write the same four `BS_APP_ID_*` lines to both.
+
+## [2026-10-23] update | workflows/mobile-browserstack-qa-docker.md
+- Index line and title now say e2e `.env`, Docker Compose, and parallel runs, so a preflight scan matches that request.
+
+## [2026-10-23] create | workflows/refresh-browserstack-env-app-ids.md
+- The four `BS_APP_ID_*` values come from the newest `host_*` App Automate session, one subagent per app. `recent_apps` is too short to be the source.
+
+## [2026-10-23] update | workflows/mobile-browserstack-qa-docker.md
+- Point the `BS_APP_ID_*` note at the env refresh workflow.
+
+## [2026-10-23] update | tooling/browserstack-app-automate-api-cloud-agents.md
+- The latest CI binary for a suite is `app_details.app_url` on the first `host_*` build, not `recent_apps`.
+
+## [2026-10-23] update | tooling/redshift-allure-ops.md
+- Scenario failure text comes from `launch_scenario_results`. `scenario_step_results.scenario_id` does not match `scenarios.id`, and `migration_date` is the load time.
+
+## [2026-10-23] update | tooling/asana-api-cloud-agents.md
+- Changing a task's parent is `POST /tasks/<gid>/setParent`. A `parent` field on `PUT /tasks` is rejected.
+
+## [2026-10-22] create | repos/e2e-constance-parallel-race.md
+- Parallel copies of a scenario that sets the same Constance key still race: the first `::after` restores the default while the others are still reading it.
+
+## [2026-10-22] update | workflows/mobile-ios-localhost-automation-build.md
+- Hermes prebuilt replace fails the same way as RN core when the `-r` tarball is missing. The script deletes the extracted engine when the last-build marker is a different configuration.
+
+## [2026-10-22] update | repos/hyperview-local-mobile-sync.md
+- Hyperview `master` is now a Yarn 4 workspace. Stale `node_modules` breaks jest (preset not found). Run `yarn install --immutable` at the root, then run jest from `hyperview/`.
+
+## [2026-10-22] update | repos/mobile-step-definition-conventions.md
+- Do not read the window or screen size to decide whether an element is tappable. Swipe with the existing helper and confirm a content id.
+
+## [2026-10-22] update | repos/mobile-automation-waits.md
+- A horizontal tab strip's last item can report displayed while clipped. The click returns, the label assertion passes, and the panel-only copy never appears. The shared text step already retries, so this is not a load wait.
+- Hyperview option selection is an XML `selected` attribute. It is not copied to the accessibility tree, and the underline is a style modifier. Assert the selected panel, not the tab node.
+
+## [2026-10-22] update | workflows/mobile-browserstack-qa-docker.md
+- An iOS Files result row is a cell whose name starts with the file stem. Match it with a predicate. `IdSelector` `StartsWith` is rejected by `AppleSelector`.
+
+## [2026-10-21] update | workflows/mobile-browserstack-qa-docker.md
+- The iOS Files picker on a shared BrowserStack device opens on the last-used tab. The sheet title during the open animation is that default. A resume step that only leaves Recents when the empty-state sentence is showing passes only when the device restores Browse.
+
+## [2026-10-20] create | infra/celery-worker-capacity.md
+- Deployed Celery parallelism is the worker command and ECS service count in `Instawork/infrastructure`. The app repo only names queues.
+
+## [2026-10-20] update | workflows/mobile-browserstack-qa-docker.md
+- Long-lived shared automation companies carry lifecycle timestamps stamped once by periodic tasks from whatever shifts existed then. Scenarios asserting time-windowed partner behaviour must pin that timestamp; otherwise they decay into flakes weeks later.
+
+## [2026-10-20] update | workflows/instawork-local-hiring-opensearch-setup.md
+- The recruitics ready check reads reference numbers from the environment's `RECRUITICS_JOB_SYNC_URL` and caches them as `e2e_recruitics_feed_references`. A fixed fixture id list only matches one feed.
+
+## [2026-10-20] update | workflows/instawork-local-hiring-opensearch-setup.md
+- Jobs features prepare the recruitics feed with `I ensure recruitics jobs are searchable`. That step creates the hiring alias only when it is missing and serializes the sync on the cache key `e2e_recruitics_jobs_searchable`.
+
+## [2026-10-20] update | workflows/instawork-local-hiring-opensearch-setup.md
+- Parallel jobs features on a shared env delete each other's OpenSearch documents: the sync finalizer deletes every OPEN job not stamped with its own `sync_process_id`. Recovery is partial because only easy-apply jobs get the artform re-index.
+- `CACHE_SYNDICATED_JOB_IDS_FROM_OPENSEARCH` caches a partial list per pro for 300s, which outlives every step retry.
+
+## [2026-10-19] update | workflows/instawork-local-hiring-opensearch-setup.md
+- A Jobs tab interview step looking for "Apply to interview" on an APPLIED / Continue Application screen opened the application intro. `DIRECT_TO_SHIFT_REDIRECT` defaults off and the suite never sets it.
+- The same scenario's booked headline is skipped when the shift starts 2 days out. Confirmation opens 24 hours before start, and the default flag keeps the locked confirm task on screen.
+
+## [2026-10-16] update | workflows/mobile-browserstack-qa-docker.md
+- Interview-shift applicant scenarios stay off demo because setup waits for an OpenShift row that demo does not write. The skip applies only when the launch tags include `~exclude_from_demo`.
+
+## [2026-10-16] update | tooling/instawork-automation-api.md
+- Local terms rows are missing when QA has them. List with the numeric type, read the body from the legal page, and create with the choice label.
+
+## [2026-10-16] create | repos/instawork-docker-uv-data-stale.md
+- A missing import for a package already in requirements.txt is the `uv_data` volume, not the image. `just pip-sync` writes that volume.
+
+## [2026-10-16] update | workflows/mobile-browserstack-qa-docker.md
+- Parallel applicant runs on one shared backend both create the same fixed company in `before_workers`. The loser logs a hook error and can still report the scenario passed.
+
+## [2026-10-16] update | tooling/django-get-or-create-conflict-test.md
+- An unsaved one-to-one instance built with its parent set is cached on that parent. `hasattr` then skips the database lookup. Build the instance inside the mocked call.
+
+## [2026-10-16] update | tooling/browserstack-failure-triage.md
+- A refused device-port connection while starting the session means the scenario never ran. Later errors on a missing driver are that same failure.
+
+## [2026-10-16] create | tooling/django-get-or-create-conflict-test.md
+- A row inserted inside `create()` during `get_or_create` is rolled back with the failed insert. Insert it after the lookup misses and before the savepoint so the recovery lookup can see it.
+
+## [2026-10-15] update | repos/instawork-worker-app-shell-sendbird-500.md
+- Another token request does not create a missing Sendbird user. A refresh loop stays empty and adds more token posts.
+
+## [2026-10-15] update | repos/instawork-worker-app-shell-sendbird-500.md
+- HTTP 400 with Sendbird code 400201 means the token call ran and that user id is missing from the Sendbird app. The refresh does not create the user.
+
+## [2026-10-15] update | repos/instawork-worker-app-shell-sendbird-500.md
+- The empty-token path does not log or raise, so Sentry will not show it. A profile-update connection error is a different call.
+
+## [2026-10-15] update | repos/instawork-worker-app-shell-sendbird-500.md
+- A fast empty `session-token-refresh` after a burst of new workers is Sendbird answering with no token. The retries are more token posts and keep the shared app saturated.
+
+## [2026-10-15] update | workflows/mobile-browserstack-qa-docker.md
+- Many BrowserStack Local binaries started in the same second can all fail DNS for the binary host. The scenario still runs with the tunnel down, so stagger the containers and treat `Browserstack local running: False` as a failed run.
+
+## [2026-10-15] update | tooling/instawork-cursor-backend-debugging.md
+- A Django breakpoint that logs `unable to find translation` against `e2e/mobile` paths is bound to the mobile automation session. A demo backend host means the local Django process never runs that line.
+
+## [2026-10-15] update | tooling/instawork-cursor-backend-debugging.md
+- The gitignored `.vscode/launch.json` already attaches mobile automation on ports 15678–15685. Add the Django attach configs there.
+
+## [2026-10-15] create | tooling/instawork-cursor-backend-debugging.md
+- Attach Cursor to the Dockerized Django server on port 5678 or a waiting pytest process on 5700, with local root mapped to container `/app`.
+
+## [2026-10-15] create | tooling/hyperview-navigator-event-behaviors.md
+- A navigator only runs load and on-event behaviors. A behavior cannot have an id, so a follow-up fragment is appended onto the navigator.
+
+## [2026-10-16] update | tooling/redshift-copy-load-errors.md
+- When load errors are not visible, check the S3 file locally against the schema. Varchar limits are bytes. Compare with the last good file.
+
+## [2026-10-15] create | tooling/redshift-copy-load-errors.md
+- A Redshift COPY failure in an Airflow log is only the generic XX000 message. The bad row is in stl_load_errors, and a non-superuser session sees only its own loads.
+
+## [2026-10-15] update | workflows/mobile-browserstack-qa-docker.md
+- The business suite has no demo backend entry. Use the QA profile and override the backend URL to the demo host, or every step stays untested.
+
+## [2026-10-15] update | repos/instawork-local-sendbird-user-id-collision.md
+- A missing empty-inbox string needs the screenshot. Gray placeholder rows mean the list is still loading. Named conversations mean the Sendbird user already had channels.
+
+## [2026-10-15] update | repos/airflow-allure-launch-without-scenarios.md
+- A launch missing scenario rows in the warehouse can still have leaf results in TestOps. Check `totalElements` before treating the source as gone.
+
+## [2026-10-15] update | repos/airflow-allure-launch-without-scenarios.md
+- Skipped launches stay out of the table and keep the four-launch window. Deleting an older hole does not guarantee the next run reaches it.
+
+## [2026-10-15] update | repos/airflow-allure-launch-without-scenarios.md
+- Re-ingest copies statistics, environments, jobs, and tags. Delete those with the launch row, or the next run duplicates them.
+
+## [2026-10-15] create | repos/instawork-local-sendbird-user-id-collision.md
+- A new local worker can show old Messages because Sendbird identity is the numeric user id on the shared app. A fresh session token does not create an empty inbox.
+
+## [2026-10-15] update | workflows/mobile-browserstack-qa-docker.md
+- A real BrowserStack device white-screens when the app still points at localhost. Recreate the backend so `IW_DOMAIN` is `http://bs-local.com:8080`, and use that same host for the launch override.
+
+## [2026-10-15] create | repos/airflow-allure-launch-without-scenarios.md
+- A launch id in `allure_ops.launches` is treated as done before scenario rows exist. An empty TestOps leaf or a failed scenario fetch stays missing on every later run.
+
+## [2026-10-15] create | tooling/redshift-allure-ops.md
+- Allure warehouse tables are the `allure_ops` schema on `instawork-dw` / `instawork`. The Finch prod Redshift plugin can read them. There is no allureops database.
+
+## [2026-10-14] update | repos/instawork-worker-app-shell-sendbird-500.md
+- A shell 500 on `GET /biz_app/app` after partner login is often the duplicate Sendbird session-token insert, not the connection error. Match the request id.
+
+## [2026-10-14] update | tooling/asana-api-cloud-agents.md
+- A story written with unsupported rich-text tags is stored as escaped markup and renders as raw tags. Use the same XML rules as a task description, and check the saved html for real tags.
+
+## [2026-10-14] create | repos/instawork-worker-app-shell-sendbird-500.md
+- A generic Hyperview 500 on the authenticated worker app shell maps to an uncaught Sendbird session-token fetch. Match the response request id in Sentry before treating it as test data.
+
+## [2026-10-14] update | tooling/browserstack-app-automate-api-cloud-agents.md
+- App Automate network logs are HAR JSON; failed app responses include response bodies and tracing headers that can connect an error screen to an endpoint. Exclude driver and OS/CDN noise, and preserve an explicit no-failed-response result when the HAR is inconclusive.
+
+## [2026-10-14] update | tooling/android-rn-native-crash-repro.md
+- Galaxy A16 replays that end on this fatal time are mostly shifts home or gig details while scrolling. One is the screening call. No shared control.
+
+## [2026-10-13] update | tooling/android-rn-native-crash-repro.md
+- Worker-app replay API event times are UTC. The project UI timezone is America/Los_Angeles, so do not compare that clock to a Sentry Z timestamp.
+
+## [2026-10-13] update | tooling/browserstack-app-automate-api-cloud-agents.md
+- App Live's device picker is not the Appium catalog. Galaxy A16 5G and Galaxy A17 on Android 16 show in App Live and are absent from GET /app-automate/devices.json. Those sessions stay manual.
+
+## [2026-10-13] update | tooling/browserstack-app-automate-api-cloud-agents.md
+- App Live recent apps are the named beta and production APKs. App Automate apps are CI builds with a version suffix. Match the store build via the -ci- sha on versionCode. An old bs:// id is still on the session that used it. An App Live bs:// id does not run in App Automate.
+
+## [2026-10-13] update | tooling/android-rn-native-crash-repro.md
+- A system-only MotionEvent getRawAxisValue abort is not the Fabric teardown race. No shared screen and store-only means no tap sequence. getRawX(pointerCount) forces the OS fatal only.
+
+## [2026-10-13] update | tooling/sentry-mobile-rn-upgrade-filter.md
+- Events-list Title is the top symbol. Aggregate stack.function before splitting an abort issue from an IdGenerator SIGSEGV.
+
+## [2026-10-13] update | tooling/instawork-automation-api.md
+- Public swagger schema generation builds views with request=None. A serializer switch that reads request.method 500s the whole document.
+
+## [2026-10-12] update | tooling/instawork-automation-api.md
+- Focused demo cleanup: delete companies before workers. Owner-less companies fail DELETE with
+  UserProfile missing; peel FK children via run-celery-task SQL when stuck.
+
+## [2026-10-12] update | tooling/allure-testops-screenshots.md
+- The ios tag on a mobile test result is the scenario tag. The device platform is the launch name prefix.
+
+## [2026-10-12] update | workflows/mobile-browserstack-qa-docker.md
+- The BrowserStack build name is the application name plus BUILD_ID, so iOS and Android stay separate unless a set_capability build tag overrides it.
+
+## [2026-10-12] update | tooling/allure-testops-screenshots.md
+- Platform for a TestOps result is the ios or android tag. If the tag is missing, use the launch name prefix.
+
+## [2026-10-12] update | tooling/allure-testops-screenshots.md
+- The BrowserStack recording link is the first dashboard session href in the HTML attachment named BrowserStack session links.
+
+## [2026-10-12] create | tooling/allure-testops-screenshots.md
+- TestOps screenshots are attachments on the tree's test result id. An image with content-length 0 is a missing file.
+
+## [2026-10-10] update | workflows/mobile-browserstack-qa-docker.md
+- Applicant behave exclude drops a feature filename that contains `deep_`. The run exits 0 with 0 features queued.
+
+## [2026-10-09] update | workflows/mobile-browserstack-qa-docker.md
+- A fresh demo hostname can resolve on public DNS before Docker does. Point the automation service at public DNS and wait for the health check SHA before launching.
+
+## [2026-10-09] update | workflows/mobile-browserstack-qa-docker.md
+- BrowserStack Local runs in the automation container and only for a :8080 backend URL. The device uses bs-local.com:8080, which is the container port. Confirm the running backend checkout is the one under test.
+
+## [2026-10-09] update | tooling/appium-mcp-browserstack-device-session.md
+- The "Open this page in Instawork?" sheet belongs to the Safari handoff. `mobile: deepLink` does not show it, so the suite helper does not tap Open.
+
+## [2026-10-09] update | repos/mobile-automation-waits.md
+- `mobile: deepLink` returns when the URL is open. A sleep after it does not wait for screen content. `screen should be loaded` does not either.
+
+## [2026-10-09] update | tooling/appium-mcp-browserstack-device-session.md
+- `mobile: deepLink` with the session bundle id opens an `instawork://` login link on both a local simulator and a BrowserStack real device.
+
+## [2026-10-09] update | workflows/mobile-browserstack-qa-docker.md
+- `--threads` parallelizes by feature. Repeating one scenario needs one compose run per copy. A `--rm` run loses logs if the client exits before the container does.
+
+## [2026-10-09] update | tooling/appium-mcp-browserstack-device-session.md
+- XCUITest 5.14 `driver.get` is `simctl openurl` on a simulator and WDA `/url` without `bundleId` on a real device. `mobile: deepLink` is the call that names the bundle.
+
+## [2026-10-09] update | tooling/appium-mcp-browserstack-device-session.md
+- Suite BrowserStack sessions default to Appium 2.4.1 (XCUITest 5.14.0), which implements `mobile: deepLink`. The MCP lifecycle unknown-command error is that tool, not the suite execute script. The same call works on a local simulator.
+
+## [2026-10-09] update | tooling/appium-mcp-browserstack-device-session.md
+- iOS can open a deep link without Safari via `mobile: deepLink` on driver 4.17+ and iOS 17+. `driver.get` is not that API. An unknown-command response means the hub still needs Safari.
+
+## [2026-10-09] update | tooling/circleci-api-job-logs.md
+- An approve-hold step that exits after only "Checking type of …" lost the workflow jobs call (`curl -f`). The wrong-type branch prints a different line and exits 0. A jobs 404 on a workflow id that otherwise loads means rerun the workflow, not the job.
+
+## [2026-10-08] update | tooling/ios-safari-deeplink-address-bar.md
+- A cold start after Safari `Go` either never requests `deep_links`, or receives the login document and never runs its load behaviors. Both stay on the intro screen.
+
+## [2026-10-08] update | tooling/ios-safari-deeplink-address-bar.md
+- Intro screen plus a Safari back button means the app opened and the token query did not arrive. The step retry re-reads page source and does not reopen Safari.
+
+## [2026-10-08] update | workflows/mobile-browserstack-qa-docker.md
+- A new compose project name builds a new `<project>-automation` image. Parallel BrowserStack runs should stay on `-p mobile` and use a unique `--name` per container.
+
+## [2026-10-08] update | tooling/ios-safari-deeplink-address-bar.md
+- `setValue` `socket hang up` on the Safari URL field is the XCUITest driver losing WebDriverAgent, not the app. The locators have already succeeded.
+
+## [2026-10-08] update | tooling/ios-safari-deeplink-address-bar.md
+- The keyboard-up Safari screen can be a retry. The first failure can be `setValue` `socket hang up` after a successful `TabBarItemTitle` click and `URL` find. The click is what raises the keyboard.
+
+## [2026-10-08] update | tooling/ios-safari-deeplink-address-bar.md
+- Safari can open with the keyboard down, then focus the address field on its own within about two seconds. A `TabBarItemTitle` wait that starts after launch misses it.
+
+## [2026-10-08] update | tooling/ios-safari-deeplink-address-bar.md
+- Keyboard down keeps `name` `TabBarItemTitle`. Keyboard up renames that field to `URL`. `Go` stays disabled until the field has text.
+
+## [2026-10-08] update | tooling/ios-safari-deeplink-address-bar.md
+- Expanded Safari address field keeps id `URL`. "Search or enter website name" is the empty value. Relaunch leaves the field expanded, so each retry misses `TabBarItemTitle`.
+
+## [2026-10-08] create | tooling/ios-safari-deeplink-address-bar.md
+- A deep-link timeout on `TabBarItemTitle` is Safari's collapsed address button. An already-expanded address field means the URL was never typed.
+
+## [2026-10-08] update | workflows/web-ui-smoke-failure-triage.md
+- An empty tests API list means Playwright never ran. Read the failed v1.1 step. The alert SHA is the pipeline commit; a repeated pre-test failure belongs to the earlier commit that introduced it.
+
+## [2026-10-07] update | repos/mobile-step-retry-retrying.md
+- Prefer an in-step wait or in-step poll over `@retry`. Keep the decorator only when the whole step is safe to repeat.
+
+## [2026-10-07] update | repos/mobile-step-retry-retrying.md
+- `retrying` 1.4.2 has no settable defaults. Each `@retry(...)` stands alone. A bare `@retry` retries forever with no wait. `Exception` is caught; `BaseException` is not.
+
+## [2026-10-07] create | repos/mobile-step-retry-retrying.md
+- `retrying` re-runs the whole step. `@step` must sit above `@retry`. `wait_fixed` is milliseconds and does nothing if omitted. Scenario retry is already `TEST_GLOBAL_RETRIES`.
+
+## [2026-10-07] create | tooling/ios-visible-false-under-transparent-overlay.md
+- iOS `visible` is a hit test. A transparent absolute sibling covering a field marks that field not visible; Android `displayed` stays true.
+
+## [2026-10-07] create | repos/hyperview-optional-field-label.md
+- A Hyperview "(optional)" heading suffix is appended by the label template for non-required fields. A `label=` edit does not remove it.
+
+## [2026-10-06] update | workflows/mobile-test-impact-from-pr-or-branch.md
+- A store version is not a `/run_test` parameter. Use the release tag's per-platform CircleCI automation job number; `specific-build` cannot be `platform=both`.
+
+## [2026-10-06] create | tooling/git-blame-phantom-file-add.md
+- Blame stops when a commit records a file as added but the parent diff is empty. Blame the parent; a later same-line rewrite is not when a token was introduced.
+
+## [2026-10-06] update | workflows/mobile-ios-localhost-automation-build.md
+- Device beta IPA: `yarn build:ios:beta` in the app dir, ad-hoc match signing needs GitHub SSH + API key json; output `bin/<app>-beta.ipa`.
+
+## [2026-10-06] update | tooling/mobile-datadog-sdk-metric-check.md
+- Mobile SDK sessions are in RUM Explorer. APM Traces with `env:beta` returns no services.
+
+## [2026-10-06] update | tooling/mobile-datadog-sdk-metric-check.md
+- Beta builds show `env:beta`. iOS is the unsuffixed bundle id; Android is the `.beta` service. Filter by store version.
+
+## [2026-10-06] update | tooling/mobile-datadog-sdk-metric-check.md
+- Mobile Datadog services are split by bundle id and flavor. Staging2 appears as backend hostnames, not as a mobile env or service name.
+
+## [2026-10-06] update | tooling/mobile-datadog-sdk-metric-check.md
+- Staging and production share one RUM application. Datadog `env` is the build flavor. Each backend's Constance decides whether that environment returns a config.
+
+## [2026-10-06] create | tooling/mobile-datadog-sdk-metric-check.md
+- Mobile Datadog "metrics reported" checks need a non-debug build, non-zero sampling, and an uncancelled startup report. Custom metrics are `tti-` / `metric-` logs.
+
+## [2026-10-06] update | tooling/instawork-automation-api.md
+- Pro gig details deep link is `instawork://open-gigs/<shift group hash>`. The shift-group `shareable_link` field is not that screen.
+
+## [2026-10-06] update | tooling/instawork-automation-api.md
+- Booking via shift-groups `worker_id` skips the Worker Assigned log unless `resolved` is true. My Shifts 500s on a lost-Top-Pro worker until `POST /worker-logs` event 9. The shift field accepts the hash.
+
+## [2026-10-06] update | tooling/instawork-automation-api.md
+- Staging2 automation API is the same v2 surface on admin.staging2. Swagger is `GET .../swagger`. Worker detail takes the numeric profile id; company and business detail take the admin hash id.
+
+## [2026-10-05] update | workflows/asana-bug-report.md
+- Translation bugs: locate the msgid and template, grep the `es` catalog for how sibling msgids are rendered, propose the dominant convention; obsolete `#~` entries can still match a newer live backend.
+
+## [2026-10-05] update | repos/mobile-automation-waits.md
+- The navigation-tab displayed step polls `current_screen.<tab>_tab`. Assign open shifts or profile first; UI login still leaves the verification screen.
+
+## [2026-10-05] update | workflows/ruff-noqa-cleanup-pipeline.md
+- F401 / unused-module cleanup in `lib/instatest` can delete a re-export that `e2e/mobile` steps still import. Grep the other tree before deleting; Behave fails at step load.
+
+## [2026-10-05] update | workflows/browserstack-release-feature-testing.md
+- Biz P0 plans clone `TestPlan Templates`. Drop Staging P0/P1. Feature run uses the version folder, not the template's Login placeholder.
+
+## [2026-10-05] update | workflows/browserstack-release-feature-testing.md
+- A P0 release plan keeps Prod P0, Sentry Review, Automation review, and the version feature-testing run. Drop the copied Staging run.
+
+## [2026-10-05] update | tooling/browserstack-test-management-api.md
+- Delete a test run with POST `.../test-runs/{id}/delete`. HTTP DELETE 404s.
+
 ## [2026-10-05] create | workflows/browserstack-release-feature-testing.md
 - Release feature cases go under the project's Release Feature Testing folder, one case per note, links in preconditions. Create response often omits the TC id.
 

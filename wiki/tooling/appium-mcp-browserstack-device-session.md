@@ -1,6 +1,6 @@
 ---
 title: Appium MCP device sessions on BrowserStack (applicant app)
-updated: 2026-10-01
+updated: 2026-10-09
 tags: [mobile, tooling, gotcha, capability, qa]
 area: tooling
 ---
@@ -59,10 +59,18 @@ for the Instawork applicant (Pro) app on Android or iOS, per
   row content such as date, payout type, amount, and destination, then validate the target
   transaction inside Payment Details instead of hardcoding the manifest's expected row id.
 - **iOS BrowserStack XCUITest:** `appium_app_lifecycle` `deep_link`, `clear`, and `background` are
-  unsupported (`Unknown mobile command`). Open applicant deeplinks via Safari instead: activate
-  `com.apple.mobilesafari`, tap `TabBarItemTitle`, enter URL in `URL`, tap `Go` — same flow as
-  instatest `visit_deeplink_on_ios_via_safari`. Terminate the applicant app before a second deeplink
-  when background is unavailable. `autoAcceptAlerts=true` usually handles the Safari "Open" prompt.
+  unsupported (`Unknown mobile command`). The MCP path still opens the link in Safari: activate
+  `com.apple.mobilesafari`, tap `TabBarItemTitle`, enter URL in `URL`, tap `Go`. That is what shows
+  "Open this page in Instawork?". `autoAcceptAlerts=true` dismisses it. The suite helper does not
+  use that path and does not tap Open.
+- The non-Safari iOS API is `mobile: deepLink` with `url` and `bundleId` (`execute_script`). It
+  needs XCUITest driver 4.17+, Xcode 14.3+, and iOS 17+ on a real device (16.4 is the documented
+  floor; 16.x hangs or shows the Open sheet). This suite's BrowserStack default
+  `browserstack.appium_version` 2.4.1 ships XCUITest 5.14.0, which has the command, and the same
+  call works on a local simulator and on a BrowserStack real device for an `instawork://` login link. In that driver, `driver.get` on a simulator is `simctl openurl`
+  and on a real device is WDA `/url` with no `bundleId`. The MCP `appium_app_lifecycle`
+  unknown-command error is that tool, not this execute script. `appium:initialDeeplinkUrl` only
+  runs at session start.
 - Applicant iOS bundle id: `com.instawork.applicant-automation`.
 
 ## Gotchas

@@ -1,6 +1,6 @@
 ---
 title: Instawork automation API (/automation/api/v2)
-updated: 2026-09-08
+updated: 2026-10-28
 tags: [tooling, testing, backend, local, qa, gotcha]
 area: tooling
 ---
@@ -26,21 +26,29 @@ Bulk env cleanup (demo/QA) via per-id `DELETE` — there is no wipe-all endpoint
 
 1. `shift-groups` (often clears related bookings; transactions may drop with them)
 2. leftover `transactions`
-3. `company-payment-sources` then `companies` (company delete 500s if a payment source remains)
-4. worker dependents (`notifications`, `gig_position`, `payment-settings`, `tos-agreement`, …)
+3. `company-payment-sources` then `companies` then `businesses` — **before** workers
+4. worker dependents (`gig_position`, `payment-settings`, `worker-score`, …)
 5. `user-incentives` via `DELETE /user-incentives/delete-by-worker?user=<id>&incentive__goal=<exact goal>`
 6. `workers` (this is the user-profile surface — no separate `/user-profiles`)
 
 Drain by repeatedly deleting page-1 results until `count=0`; do not trust a single paged sweep.
+Delete companies before workers: wiping owners first can leave companies that
+`DELETE /companies/{id}` cannot remove (`UserProfile matching query does not exist`).
+
+Staging2 uses the same paths on `https://admin.staging2.instawork.com/automation/api/v2`. `GET .../swagger` returns the OpenAPI JSON (`swagger.json` 404s). No auth header is required from a machine that can already reach admin. Worker detail accepts the numeric userprofile id from the admin URL. Company and business detail accept the hash id from the admin change URL.
 
 ## Gotchas
 
+- A shift `starts_at` / `ends_at` with no offset is parsed in the request timezone. An unauthenticated call has none, so that timezone is Pacific. `business_date_now` prints the place's wall clock and then drops the offset. On a Pacific place the window is right. On any other place the stored window slides by the Pacific offset, a clock-out one minute after `starts_at` records no payable time, and the transaction task writes nothing. The shared shift format has to include the offset (`%z`). A naive datetime still formats with no offset, so those callers stay on the Pacific default.
+- `CurrentTest.api_v2_data` is a client-side ledger, not a server-backed relation cache. A business created with only `company_name` is appended to `businesses`, but its company is not added to `companies`. Before a following step reads the latest company (for example to create a payment source), fetch and append that exact company or use a setup helper that creates the full place/company/business set.
+- This swagger view is `public=True`, so DRF builds every view with `request=None`. A `get_serializer_class` that reads `self.request.method` raises `AttributeError` and 500s the whole document. The DecimalField and "not compatible with schema generation" lines above that traceback are warnings. Guard `request` before using it, and fall back to the list serializer when it is missing.
 - No trailing slashes. Endpoints 404 with a trailing `/`.
   - Good: `/automation/api/v2/constance-variables/PARTNER_PHONE_VERIFICATION_REQUIRED`
   - Bad:  `/automation/api/v2/constance-variables/PARTNER_PHONE_VERIFICATION_REQUIRED/`
 - A 404 HTML page (not JSON) means wrong URL or the backend is not automation-ready.
 - `phone-verification/direct-verify` returning `{"error":"User not found"}` is expected without a
   real user, not a failure.
+- A local database can have no live terms row that QA already has. `GET /tos` omits `content` (write-only). List QA with the numeric type and country, take the newest result, then read the body from `/legal/{country}/awfs-agreement/{id}/`. `POST /tos` wants the choice label (`AWS Agreement`), not the number.
 - If endpoints return 5xx, run migrations/demo data from `instawork/`: `just migrate`,
   `just demodata --sync`.
 - For skills-hub mobile flows (Profile -> Add skills -> category -> skill -> phone assessment), the
@@ -61,6 +69,13 @@ Drain by repeatedly deleting page-1 results until `count=0`; do not trust a sing
 - Deleting a shift group cascades to its shifts, but a worker assignment record is a separate row
   from the shift's own worker FK. Removing an assignment does not unbook the shift, and an app list
   driven by the shift FK keeps showing it. Delete the owning group to actually clear a booking.
+- Shift-group `shareable_link` is not gig details. The pro-app shift details link is
+  `instawork://open-gigs/<shift group hash>`.
+- `POST /shift-groups` with `worker_id` sets the shift's worker and does not write a Worker Assigned
+  log unless `resolved` is also true. My Shifts then 500s in
+  `has_lost_top_pro_bonus_from_future_shifts` (`None.created_at`) for a worker who lost Top Pro.
+  Add the log with `POST /worker-logs` `{"event": 9, "worker": <id>, "shift": "<shift hash>"}`.
+  The shift field accepts the hash even though the schema says integer.
 - `GET /gig_template/{id}` omits `company` and `business`. To get the numeric company id after
   creating a shift group, take `contacts[0]` from that template and `GET /company_user?cuser=<id>`.
 - Booking-prerequisites attire upload is not a shift-group flag. It needs an attire preset on the
@@ -83,7 +98,15 @@ Drain by repeatedly deleting page-1 results until `count=0`; do not trust a sing
   invoice inside the backend runtime from the transaction or shift, then pass that object ID to the
   task call.
 - `DELETE /companies/{id}` returning HTML 500 usually means a `company-payment-sources` row still
-  points at that company — delete the payment source first.
+  points at that company — delete the payment source first (soft-deleted rows may still list and
+  still block).
+- `DELETE /companies/{id}` returning `UserProfile matching query does not exist` (and
+  `GET /company_user` 404 with the same detail) means an owner/company-user profile was already
+  wiped. Prefer deleting companies before workers. Last resort on a stuck company: peel child
+  rows via `POST /run-celery-task` with
+  `task_import: from django.db import connection` and
+  `task_call: (lambda c: (c.execute("DELETE FROM <child> WHERE company_id=<pk>"), c.rowcount))(connection.cursor())`,
+  repeating on each FK table named in the 1451 error, then `DELETE FROM backend_company`.
 - `DELETE /workers/{id}` HTML 500 is almost always leftover dependents. Plain
   `DELETE /user-incentives/{id}` can also 500; use `delete-by-worker` with the exact
   `incentive__goal` string from the validator error (e.g. `Instantly earn Top Pro Gold`). The

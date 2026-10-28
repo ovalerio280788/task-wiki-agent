@@ -1,6 +1,6 @@
 ---
 title: mobile — waits and sleeps in the e2e suite
-updated: 2026-09-30
+updated: 2026-10-22
 tags: [mobile, testing, gotcha]
 area: repos/mobile
 ---
@@ -51,14 +51,30 @@ from method calls that end in the same characters. `src/instatest` is git-ignore
   `driver.implicitly_wait(seconds)`. That sets session-wide implicit wait and returns immediately:
   the scenario does not pause, and every later element lookup in that session inherits the new
   timeout. Read the step body before trusting the Gherkin phrasing.
+- **A sleep after `mobile: deepLink` is not the open signal.** The script returns when WebDriverAgent has opened the URL. A fixed pause after that is leftover from tapping Safari Go, which returns before the app is in front. Screen content still arrives later; the following step has to poll. `the <X> screen should be loaded` does not.
 - **`the <X> screen should be loaded` is not a wait and not an assertion.** Its helper only
   instantiates the screen class. Swapping a sleep for that step converts a slow test into a fast
   false pass. Confirm the step actually asserts before using it as a replacement.
+- **`the {tab} navigation tab should be displayed` is a real wait, and it needs that screen assignment first.**
+  It reads `current_screen.<tab>_tab` (`@element`, so the lookup polls) and retries. Put
+  `the open shifts screen should be loaded` (or profile) immediately before it. A UI login leaves
+  the verification screen, which has no tab property, so the tab line fails as the next step.
+  A deep link whose validator already loaded open shifts or profile has assigned that screen.
 - **A fixed wait whose stated reason is generic ("to allow the screen to load") carries no
   information about what to wait on.** Recovering the intent needs the scenario and usually a
   device run, so it is human review time, not mechanical conversion.
 - **Do not wait on copy.** A step like `wait until "Your past shifts" is displayed` couples
   readiness to one locale string and one empty/full variant. Prefer a screen-owned id.
+- **A passed tab-label assertion does not mean the tab selected.** The label lives on the
+  tab item, so exact text for that label passes while the previous panel is still showing.
+  The last item in a horizontal strip can report `is_displayed` while clipped. `click()`
+  then returns without firing the tab's select behavior, and the panel-only sentence never
+  appears. The shared text step already retries, so this is not a load wait and not missing
+  list data. Do not measure the window to decide the tab is fully visible. Swipe with the
+  existing helper and confirm the content id that appears only after that tab selects.
+  Hyperview stores selection as `selected="true"` on the `<option>`, and that attribute
+  is not copied to `accessibilityState`, so the
+  accessibility tree has no selected flag to read. The underline is a style modifier.
 - **Loader-gone is not a universal wait.** Hyperview list shells often mount `{% loader %}`
   (MDS shimmer + skeleton) and `replace-inner` it when data arrives. That is a good *local*
   signal for those screens, not a hook after every login or navigation. Many screens never

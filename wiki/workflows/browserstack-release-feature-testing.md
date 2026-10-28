@@ -53,6 +53,13 @@ Leave steps empty. Do not set `Imported Test Case ID`.
 
 5. Confirm with `GET /api/v2/projects/<PR-id>/test-cases?folder_id=<folder_id>`. The create response often omits `identifier` and `urls`.
 
+6. Clone a P0 release plan from the project's template, then keep only Production P0, Sentry review, and Automation review. Drop the Staging run. Add one run named `<version> Release - Feature testing` whose cases are the folder from step 3, not the template's Feature Testing placeholder.
+
+| App | Template plan | P0 run | Staging run to drop |
+| --- | --- | --- | --- |
+| Applicant `PR-1028` | `[Template] Release-Testing-P0-P1-tests` | `Prod P0 - Android & iOS` | `Staging Android & iOS` |
+| Biz `PR-1023` | `TestPlan Templates` | `Production P0 - Android & iOS` | `Staging P0/P1 - Android & iOS` |
+
 ## Gotchas
 
 - Root `GET /folders` does not include sub-folders. Creating without `parent_id` puts a second folder at the root.

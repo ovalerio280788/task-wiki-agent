@@ -1,6 +1,6 @@
 ---
 title: BrowserStack failure triage
-updated: 2026-06-30
+updated: 2026-10-16
 tags: [tooling, mobile, workflow, gotcha]
 area: tooling
 ---
@@ -29,7 +29,9 @@ Do not read test code yet. Use session `name` only to identify which test ran.
 2. **Screenshots** — grep text logs for `browserstack-debug-screenshots` URLs; correlate by timestamp (needs `browserstack.debug` cap)
 3. **Appium logs** (`/appiumlogs`) — server-side stack traces
 4. **Device logs** (`/devicelogs`) — `FATAL`, `AndroidRuntime`, ANR
-5. **Network logs** (`/networklogs`) — HAR; filter `response.status >= 400`
+5. **Network logs** (`/networklogs`) — HAR; filter `response.status >= 400`. The HAR also carries
+   response **bodies**, so a 200 that renders the wrong value is provable here: grep the body for
+   the asserted copy. This is the strongest evidence for "backend served the wrong thing" flakes.
 6. **Crash logs** (`/crashlogs`) — 404 means no native crash
 
 ### Step 1 output (keep brief)
@@ -52,6 +54,7 @@ Reconcile BS evidence with code: which step was running, what it expected, does 
 ## Gotchas
 
 - **`reason` is not the failure explanation.** Never narrate screenshots from `reason` alone.
+- **Session never started.** `Could not start Mobile Browser` plus a connection refused to the device port, with session `start-error`, means the device session never came up. Later `implicitly_wait`, `quit`, or `page_source` errors on `None` are that missing driver, not a failed step. Do not triage it as an app assertion.
 - **Two statuses:** client `status` vs `browserstack_status` measure different things.
 - **Last screenshot ≠ failure moment.** Match screenshot timestamps to text log errors.
 - **No crash ≠ no failure.** Element errors and UI hangs won't appear in `/crashlogs`.

@@ -1,6 +1,6 @@
 ---
 title: Sentry filters for mobile RN upgrade builds
-updated: 2026-09-18
+updated: 2026-10-13
 tags: [mobile, tooling, gotcha]
 area: tooling
 ---
@@ -37,31 +37,32 @@ Automation/beta also change `bundleId` via Android `applicationIdSuffix` (and iO
 13. **AppExitInfo ANRs with Chromium/WebView init, `syscall` wait, or an empty stack are not Fabric signatures.** A New-Arch ANR shows `FabricUIManager` / `MountItemDispatcher` / Reanimated `NodesManager` on the main thread. Confirm with `get_issue_tag_values` on `release` for the known Fabric issues, not only the hotfix’s new fingerprints.
 14. **A later RN patch that kills one Fabric crash class does not close the others.** Query the hotfix `release:` for `error.type:SIGSEGV` (and known native titles) even when `firstRelease:` of the hotfix is mostly ANRs. The original New Arch issue id keeps accruing events; `firstRelease:` of the hotfix will not show it.
 15. **`ShadowTreeRegistry::enumerate` SIGSEGV splits by caller.** RuntimeScheduler, `findNextFocusableElement`, and EventQueue flush become different issue ids. Sum by title / `error.type:SIGSEGV` on that release, not one fingerprint.
+16. **The events-list Title is that event's top symbol, not the shared cause.** Aggregate `stack.function` on the issue before splitting reasons. `abort` (SIGABRT through `LogMessage` / `art::Runtime::Abort`) and a SIGSEGV titled `android::IdGenerator::IdGenerator` are one crash when every stack still contains `android::MotionEvent::getRawAxisValue`. That frame is the OS fatal check while reading a motion event. The stacks are system-only, so the screen in breadcrumbs is not the cause. The same function can also land in an older mixed `abort` issue; count the function on the release, not one issue id.
 
-16. **iOS `EXC_BAD_ACCESS: _endSuspendingUpdates` with `UIPickerView hitTest` is one crash across many screens.** Compare the last tracking event plus `RCTFabricModalHostViewController` presented; do not split issues because the user was in artform vs education vs self-identification. The native stack is touch hit-test into picker cells (`objc_msgSend` → `_updateVisibleCellsNow:` → `UIPickerView hitTest:withEvent:`). Different Hyperview forms that open an RN Fabric picker modal share the same fingerprint.
+17. **iOS `EXC_BAD_ACCESS: _endSuspendingUpdates` with `UIPickerView hitTest` is one crash across many screens.** Compare the last tracking event plus `RCTFabricModalHostViewController` presented; do not split issues because the user was in artform vs education vs self-identification. The native stack is touch hit-test into picker cells (`objc_msgSend` → `_updateVisibleCellsNow:` → `UIPickerView hitTest:withEvent:`). Different Hyperview forms that open an RN Fabric picker modal share the same fingerprint.
 
-17. **Derive the repro cadence by counting `ui.lifecycle` breadcrumbs, not by reading the stack.** For
+18. **Derive the repro cadence by counting `ui.lifecycle` breadcrumbs, not by reading the stack.** For
    a UIKit use-after-free the stack names the victim, never the accumulating precondition. Pull
    breadcrumbs for 2–3 events and count repeats of the same `screen` with `beingPresented: true`,
    plus the gaps between them and the gap to the crash. A repeated present/dismiss cycle on one
    screen is a different repro from one long-lived presentation, and the difference decides whether
    a manual attempt can ever hit it.
-18. **Bound the OS floor from the `os` tag distribution before calling a repro attempt failed.** A
+19. **Bound the OS floor from the `os` tag distribution before calling a repro attempt failed.** A
    crash class that only exists above a given point release will never fire on an older device, and
    `get_issue_tag_values` on `os` gives that floor directly.
-19. **Check whether internal build flavors appear in `environment` / `release` before designing a
+20. **Check whether internal build flavors appear in `environment` / `release` before designing a
    repro.** A crash present on `beta` / adhoc bundle ids is reproducible in-house; one confined to
    `release` on the store bundle id may depend on release-configuration builds.
 
-20. **Before accepting "cannot reproduce", map the crashing `dist` back to a git tag and diff deps
+21. **Before accepting "cannot reproduce", map the crashing `dist` back to a git tag and diff deps
    against the local checkout.** Two builds with the same marketing version can carry different RN
    patch releases, and the release string does not show it. Resolve `dist` → `applicant-app/vX.Y.Z`
    → `package.json`. A local branch cut one build earlier can sit on an RN patch that has no field
    exposure at all, which makes a manual repro attempt meaningless.
-21. **A release with near-zero distribution is not a clean control.** Check `count()` and
+22. **A release with near-zero distribution is not a clean control.** Check `count()` and
    `count_unique(user)` for that release before reading "no events on it" as "not affected"; a build
    superseded within days can show a single-digit event count across the whole project.
-22. **Join Amplitude product `userId` to Sentry `user.id`.** Same integer. Amplitude activity after
+23. **Join Amplitude product `userId` to Sentry `user.id`.** Same integer. Amplitude activity after
    the crash timestamp is a relaunch, not the dying process; cut the session at the Sentry
    `timestamp` and read breadcrumbs for the wheel. Amplitude has no picker-open event.
 

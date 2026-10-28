@@ -1,6 +1,6 @@
 ---
 title: Web UI smoke failure triage
-updated: 2026-09-29
+updated: 2026-10-08
 tags: [workflow, ci, gotcha]
 area: workflows
 ---
@@ -14,11 +14,15 @@ deploy commit caused it or a known flaky `@p1` gated the job.
 
 1. Job number from the CircleCI URL → v2 tests API
    `GET /api/v2/project/gh/Instawork/instawork/<job>/tests`.
-2. Compare failing classname/title to the deploy SHA diff. Smoke runs on localhost against the
-   commit under test; an unrelated mobile/e2e-only SHA is usually not the cause.
-3. Read retries in the failure message: inconsistent assertion sites across attempt/retry =
+2. An empty `items` list means Playwright never ran. Read the v1.1 step list and the failed
+   step log. `Apply migrations to the database` exit 1 is a migrate crash, not a UI failure.
+3. Compare failing classname/title to the deploy SHA diff. Smoke runs on localhost against the
+   commit under test; an unrelated mobile/e2e-only SHA is usually not the cause. The alert names
+   the pipeline commit. If the same pre-test step fails on every master deploy since an earlier
+   commit, that earlier commit is the cause.
+4. Read retries in the failure message: inconsistent assertion sites across attempt/retry =
    flake signature.
-4. Screenshots live in artifact `e2e/web/test-results.zip` (not always as flat artifact paths).
+5. Screenshots live in artifact `e2e/web/test-results.zip` (not always as flat artifact paths).
    Download with `Circle-Token` + `curl -sSL`.
 
 Smoke job shape (deploy workflow):

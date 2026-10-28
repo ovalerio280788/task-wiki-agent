@@ -1,6 +1,6 @@
 ---
 title: Mobile test impact from PR or branch
-updated: 2026-09-30
+updated: 2026-10-06
 tags: [testing, mobile, runbook, capability]
 area: workflows
 ---
@@ -74,8 +74,9 @@ After producing the run plan, also generate a ready-to-send Slack command for ea
    - `mobile-tests-behave-args` (advanced filtering/retries)
    - `mobile-tests-global-retries` (retry count override)
 5. Include binary selectors only when needed:
-   - `mobile-tests-binary-source-branch="my-mobile-branch"`
+   - `mobile-tests-binary-source-branch="my-mobile-branch"` (latest successful automation build on that mobile branch; default is master)
    - or `mobile-tests-binary-source="specific-build" mobile-tests-binary-source-build-number="123456"`
+   - A store version is not a parameter. Resolve the mobile tag `applicant-app/vX.Y.Z` (or `business-app/vX.Y.Z`) to the commit, then take the CircleCI job numbers from the `build-app-<app>-<platform>-automation` statuses on that commit. `specific-build` is one job number, so it cannot be combined with `mobile-tests-platform="both"` or `mobile-tests-project="both"`; send one command per platform.
 6. Keep one Slack command per run objective:
    - targeted applicant scenario(s)
    - targeted business scenario(s) when applicable

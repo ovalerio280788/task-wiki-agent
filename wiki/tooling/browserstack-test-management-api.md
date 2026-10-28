@@ -179,6 +179,7 @@ curl -sS -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
   with "Please enter a valid Project ID". Pass `project_identifier: PR-1028`.
 - **Different host from App Automate.** Test Management is `test-management.browserstack.com`;
   App Automate is `api-cloud.browserstack.com`. Don't cross them.
+- **Deleting a run is `POST .../test-runs/{id}/delete`.** `DELETE` on the run URL returns 404 with "invalid endpoint".
 - **`update-test-cases` may be unavailable on some accounts.** If
   `PATCH /test-runs/{id}/update-test-cases` returns 404, use
   `PATCH /test-runs/{id}/update` with `test_run.test_cases` to set the run's test case list.

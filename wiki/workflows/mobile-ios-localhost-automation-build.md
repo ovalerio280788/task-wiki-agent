@@ -1,6 +1,6 @@
 ---
 title: Mobile iOS automation app build against localhost
-updated: 2026-09-29
+updated: 2026-10-22
 tags: [testing, mobile, local, runbook, command, gotcha]
 area: workflows
 ---
@@ -99,6 +99,16 @@ Same recipe from `mobile/business-app`: workspace `ios/business.xcworkspace`, sc
 simulator:true` lane needs match signing secrets, so plain `xcodebuild` is the local path.
 Bundle id is `com.instawork.business.automation` (dots, per the Fastfile `BUNDLE_IDS`).
 
+## Device beta IPA
+
+For a signed device build (TestFlight-equivalent, backend staging2) run `yarn build:ios:beta` from
+the app directory (`applicant-app` or `business-app`). The lane pulls ad-hoc profiles via match
+from the secrets repo, so it needs working GitHub SSH, the App Store API key json in `fastlane/`,
+`bundle check` green, Pods in sync, and `node_modules` present. Output is
+`bin/<app>-beta.ipa`, versioned `<package version>-<user>-<sha>`; ~12 min on a warm machine. Tail
+the log for `Successfully exported and signed the ipa file` rather than relying on the fastlane
+update nag at the end.
+
 ## Gotchas
 
 - Before building, check `node_modules` and Pods are current for the checked-out branch:
@@ -107,11 +117,17 @@ Bundle id is `com.instawork.business.automation` (dots, per the Fastfile `BUNDLE
   can need `--repo-update` after a Datadog bump; jsDelivr CDN errors during that update are
   non-blocking when `Podfile.lock` still matches `Pods/Manifest.lock`.
 - Prebuilt RN core: the `[RNCore] Replace React Native Core` script phase fails with
-  `tar: .../ReactNativeCore-artifacts/reactnative-core-<ver>-release.tar.gz: No such file` when
-  Pods only has the previous RN version's tarballs. `pod install` does not refetch them. Download
-  both from Maven into `Pods/ReactNativeCore-artifacts/`:
+  `tar: .../ReactNativeCore-artifacts/reactnative-core-<ver>-{debug,release}.tar.gz: No such file`
+  when Pods only has the previous RN version's tarballs. `pod install` does not refetch them. The
+  `<ver>` is the `-r` argument in that Pods script phase. Download both from Maven into
+  `Pods/ReactNativeCore-artifacts/`:
   `https://repo1.maven.org/maven2/com/facebook/react/react-native-artifacts/<ver>/react-native-artifacts-<ver>-reactnative-core-{debug,release}.tar.gz`
-  and name them `reactnative-core-<ver>-{debug,release}.tar.gz`.
+  and name them `reactnative-core-<ver>-{debug,release}.tar.gz`. Hermes is the same failure in
+  `[Hermes] Replace Hermes`: version is that script's `-r` value, not the React Native version.
+  Maven path `com/facebook/hermes/hermes-ios/<ver>/hermes-ios-<ver>-hermes-ios-{debug,release}.tar.gz`,
+  saved as `Pods/hermes-engine-artifacts/hermes-ios-<ver>-{debug,release}.tar.gz`. Either replace
+  script deletes the extracted engine when `Pods/.last_build_configuration` (Hermes) or
+  `React-Core-prebuilt/.last_build_configuration` is not the configuration being built.
 - `xcodebuild ... | rg "error:"` misses script-phase failures. Grep for
   `The following build commands failed` and read the `PhaseScriptExecution` block above it.
 - `bundle exec pod install` from `applicant-app/` root fails with:

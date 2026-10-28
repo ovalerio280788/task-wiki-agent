@@ -1,6 +1,6 @@
 ---
 title: CircleCI API — fetching job failure logs
-updated: 2026-08-20
+updated: 2026-10-09
 tags: [tooling, ci, capability, command, gotcha]
 area: tooling
 ---
@@ -84,6 +84,8 @@ PYEOF
 **`has_output: true`** must be checked before following `output_url`. Steps that produced no output have `has_output: false` and no valid URL.
 
 **v2 `GET /project/{slug}/job/{job-number}` often returns empty `steps`** — do not rely on the v2 job endpoint for step data. Always use v1.1 for logs.
+
+**Swissknife "Approve On Hold Job(s) by Name" that prints only `Checking type of <job>....` and exits 1** did not decide the hold was the wrong type. That branch prints `<job> is NOT approval job!` and, with `kill-gracefully` true, exits 0. Exit 1 with no further line means `curl -f` against `GET /api/v2/workflow/{id}/job` failed before `read` got a line (`set -e`). A 404 body of `Workflow not found` still happens when `GET /workflow/{id}` is 200. Project API tokens are unsupported on v2 and return that 404; use a personal token. If the jobs call still 404s for that workflow id, rerunning the job in place fails again. Rerun the workflow from the start so it gets a new id. Confirm with the jobs call before rerunning.
 
 ## Recommended flow: pipeline → workflow → job → logs
 

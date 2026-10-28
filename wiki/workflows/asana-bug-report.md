@@ -1,6 +1,6 @@
 ---
 title: Asana bug report
-updated: 2026-08-31
+updated: 2026-10-05
 tags: [testing, tooling, runbook]
 area: workflows
 ---
@@ -63,6 +63,12 @@ uvx --from openai-whisper whisper audio.wav --model small --language en \
    low-bitrate, so text that is small, or covered by a translucent overlay, is destroyed in the
    encode; upscaling and contrast/gamma tricks only wash it out further. Grep the repo for a
    neighbouring visible string on the same screen, then read the exact label out of that template.
+11. **Ground a mistranslated label before proposing a fix.** Find the `msgid` in
+   `instawork/locale/en/LC_MESSAGES/django.po` and the template that `{% trans %}`es it, then grep
+   the `es` catalog for how sibling msgids with the same meaning are already rendered and propose
+   the dominant convention, not a dictionary pick. Also check the same screen for a second string
+   that should follow the same term. A `#~` (obsolete) `es` entry can still be what the live app
+   shows when the local checkout is older than the backend; say so instead of claiming it is fixed.
 
 Long recordings (for example 20 minutes with the bug at minute 12) are fine as input; only the
 trimmed segment goes on the ticket.

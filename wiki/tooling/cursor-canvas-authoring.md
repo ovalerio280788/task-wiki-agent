@@ -1,6 +1,6 @@
 ---
 title: Cursor canvas authoring
-updated: 2026-09-19
+updated: 2026-10-27
 tags: [tooling, gotcha, capability]
 area: tooling
 ---
@@ -21,6 +21,7 @@ single `.canvas.tsx` React file the IDE compiles and opens beside the chat.
 - The write/edit tool result ends with a `Canvas TypeScript check` line. That is the authoritative
   diagnostics signal — iterate until it says no errors.
 - Import only from `cursor/canvas`, embed all data inline, default-export the component.
+- Every `Table` starts with a `#` column. Number the rows `1`, `2`, `3` in the order they are listed. When a filter hides rows, keep each row's number from the full list.
 - Converting a markdown report: keep the numbers and links, drop the markdown scaffolding.
   Multi-line table cells and repeated one-task-per-row hacks are unnecessary. Use real columns
   (`Slice | Task | Owner | Status`) and put the group label on the first row of each group.

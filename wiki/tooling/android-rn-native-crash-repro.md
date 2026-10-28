@@ -1,6 +1,6 @@
 ---
 title: Android RN native crash repro
-updated: 2026-08-27
+updated: 2026-10-13
 tags: [mobile, testing, gotcha]
 area: tooling
 ---
@@ -66,6 +66,13 @@ correct tap sequence alone usually fails and the session looks like a false nega
 - Repro steps inferred from breadcrumbs give the screen order and rough gaps, never the exact
   preconditions (process state, memory pressure). Reconstruct the preconditions explicitly and state
   them as part of the steps.
+- **A system-only `MotionEvent::getRawAxisValue` abort is not this teardown race.** Don't keep
+  activities will not make it deterministic. If every stack is system frames, sampled sessions do
+  not share a screen, and the function exists only on the store release for one OEM and OS major,
+  there is no tap sequence to write. The same abort signature can be forced on any Android device
+  by calling `MotionEvent.getRawX` with `pointerIndex == pointerCount` on a one-pointer event.
+  That confirms the OS fatal. It does not show the app reached that call.
+- **A matching user and end time is only a candidate.** The production worker app uses the Sentry `user.id` as the Amplitude user id. Compare Sentry's `Z` timestamp to the replay API `eventTime`, which is UTC even though this project's UI timezone is America/Los_Angeles. A replay that ends near the fatal timestamp still needs a timeline check. If product events continue after that timestamp, the session was still alive. No crash event in the timeline means the recording was not shown to contain the abort. On the Galaxy A16, those replays mostly sit on shifts home or gig details while a list or the details sections are scrolling. One session is the screening call. There is still no shared control.
 
 ## Related
 

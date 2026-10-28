@@ -1,6 +1,6 @@
 ---
 title: mobile — step definitions conventions
-updated: 2026-09-28
+updated: 2026-10-28
 tags: [mobile, testing]
 area: repos/mobile
 ---
@@ -14,6 +14,8 @@ suite (`*/test/automation/.../steps/*.py`).
 
 ## What works
 
+- Do not read the window or screen size to decide whether an element is tappable. Use the
+  existing swipe helper, then confirm a content id that appears only after the action.
 - Signal step outcomes with `assert <condition>, "<message>"`, not bare `return` on
   success or `raise AssertionError` on failure. The message is what surfaces in the
   failure report, so make it specific and include the observed value.
@@ -64,6 +66,7 @@ Android is the default platform for all scenarios. No `@android` tag exists or i
 
 ## Gotchas
 
+- **A missing step is Behave status Broken, with a snippet, before any assertion.** The message starts with `You can implement step definitions for undefined steps`. Search `*.feature` for that phrase and reuse the step sibling scenarios already call. A Background migration can leave the same lines copied inside one scenario.
 - **The behave step matcher is process-global, and `@step` binds it at decoration time.**
   `use_step_matcher` mutates one module-level singleton in `behave/matchers.py`. The rule
   that follows: each step module must call `use_step_matcher(...)` *after all its imports

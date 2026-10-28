@@ -1,6 +1,6 @@
 ---
 title: Hyperview local mobile sync
-updated: 2026-09-16
+updated: 2026-10-22
 tags: [mobile, local, command, capability]
 area: repos/hyperview
 ---
@@ -40,7 +40,13 @@ existing debug app. A native rebuild is not required for TypeScript-only changes
   which flavor is installed; an automation bundle id is the tell. The served bundle also shows
   the transpiled module, so you can read back the exact prop you changed.
 
-- This repo ships a Yarn Classic (`yarn.lock` v1) lockfile and no `packageManager` field, so it
+- Current `master` is a Yarn 4 workspace (root `packageManager: yarn@4.x`, workspaces `hyperview`
+  and `demo`; library sources under `hyperview/src`). A checkout whose `node_modules` predates that
+  move fails jest with `Preset @react-native/jest-preset not found`. Run
+  `yarn install --immutable` at the repo root (lockfile untouched), then run unit tests from the
+  `hyperview/` workspace: `cd hyperview && yarn jest src/elements/<el>/index.test.tsx`.
+  The Yarn Classic notes below apply only to older checkouts.
+- Older checkouts ship a Yarn Classic (`yarn.lock` v1) lockfile and no `packageManager` field, so it
   inherits whatever corepack's **global** default Yarn is. Working in a Yarn 4 repo can flip that
   default, after which `yarn` here fails with
   `hyperview@workspace:.: This package doesn't seem to be present in your lockfile` — a command

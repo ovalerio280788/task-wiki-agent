@@ -1,6 +1,6 @@
 ---
 title: Global preferences
-updated: 2026-09-24
+updated: 2026-10-27
 scope: global
 ---
 
@@ -40,3 +40,4 @@ with one here, replace it and log the change.
 - **Never:** include how a test was invoked (command, driver, device, tags, backend) unless the user asks for the invocation. Scenario name and pass/fail is enough. — added 2026-09-11
 - **Never:** label a table cell, column, card, or stat with a bare identifier code (milestone `Mn`, ticket `P4.x`, a lint code). **Do:** show the readable title so a reader knows what the work is about without a lookup. — added 2026-09-07
 - **Do:** when triaging a store app version, only flag issues where that version has more events than prior versions, and treat 1–4 unique users on the version under review as not critical. — added 2026-09-14
+- **Always:** the first column of a canvas table is `#`, with 1-based row numbers. — added 2026-10-27

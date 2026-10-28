@@ -1,6 +1,6 @@
 ---
 title: Asana API on cloud agents
-updated: 2026-09-25
+updated: 2026-10-23
 tags: [tooling, capability, gotcha, command]
 area: tooling
 ---
@@ -63,6 +63,17 @@ curl -sS -X POST "https://app.asana.com/api/1.0/task_templates/<template_gid>/in
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{"data":{"name":"Task title"}}'
+```
+
+Move a task under a parent. A `parent` field on `PUT /tasks/<gid>` is rejected with
+`please use the setParent endpoint`. This call keeps the task on its current board column:
+
+```bash
+curl -sS -X POST "https://app.asana.com/api/1.0/tasks/<task_gid>/setParent" \
+  -H "Authorization: Bearer $ASANA_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"parent":"<parent_gid>"}}'
 ```
 
 Resolve a task's milestone (or any ancestor) by walking `parent` until it is null. The
@@ -173,6 +184,11 @@ Instawork workspace. Verified 2026-08-14: `task_templates?project=...` works wit
 - **`XML is invalid` on create is usually `<p>` or `<br/>`:** both are rejected. Do not retry with
   the same markup or fall back to plain `notes` (that is what flattens the body). Use `<h2>`
   section headings with literal newlines between sections, and `<ol>`/`<ul>` for steps.
+- **A comment with `<br>` is accepted and then shown as raw tags:** `html_text` on a story uses
+  the same XML rules as `html_notes`. Unsupported tags are escaped into the comment body instead
+  of returning an error, so the thread displays `<body>` and `<strong>` as text. Rewrite that
+  story with `h2`, newlines, lists, or tables. Confirm the saved `html_text` contains real tags,
+  not `&lt;`.
 - **OAuth vars are not the PAT:** `ASANA_CLIENT_ID` and `ASANA_CLIENT_SECRET` may appear in the
   environment. Those are OAuth app credentials, not a bearer token for direct API calls.
 - **Never log or paste the token** in chat, commits, or wiki pages.
