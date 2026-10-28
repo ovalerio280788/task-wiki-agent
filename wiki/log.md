@@ -6,6 +6,9 @@
 > Rotate when this file exceeds ~500 entries or at year end: rename to `log-YYYY.md` and start fresh.
 
 ## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md
+- Android BrowserStack launches add `@set_capability::interactiveDebugging=true` on each scenario that opens a device. Do not add it for iOS.
+
+## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md
 - Pass `-e BACKEND_INSTANCE=online_qa_server`. Compose interpolates that key from `e2e/mobile/.env`, so `online_demo_server` still calls `demo-1234.instawork.com` when only `BACKEND_URL` is overridden. `browserstack.timezone` is always sent and a plan without that capability never opens a session.
 
 ## [2026-10-28] update | workflows/mobile-browserstack-qa-docker.md

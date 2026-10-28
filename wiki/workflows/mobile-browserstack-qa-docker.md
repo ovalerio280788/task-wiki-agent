@@ -45,7 +45,7 @@ Use `-ios-device` instead of `-android` for an iOS run. Preflight checks Browser
    - Do not set `@set_capability::build=`. That merges Android and iOS into one build.
 6. **Which scenarios.** One absolute `file.feature:LINE` per line, passed as `-f @/that/file`. Other scenarios in the file are skipped and do not open a device. `@broken` does not open a session either.
 7. **Parallel, at most 10 sessions.** Group by feature file so each group keeps its own build id. In one container set `MULTI_THREAD=YES`, omit `--threads`, and pass `--behave-args ++processes N ++parallel-element scenario` as four separate arguments. Do not wrap them in one pair of quotes. A quoted string is a single argument, behave reports it as an unrecognized option, and the run exits before upload. `N` is the number of selected scenarios in that feature, and the total across containers stays ≤ 10. More than 10 wait for the next wave. A single scenario is `N=1`. `@serial`, or scenarios that share mutable constance, stay at `N=1`. Instatest turns one `+` into `-`, so the flags must be `++processes` and `++parallel-element`. This skips the upload step `--threads` does, so step 1 has to be true. Set `PYTHONDONTWRITEBYTECODE=1`. Several containers need distinct `--name`s and the same `-p mobile`.
-8. **Run the tests with docker compose.** From the instawork repo root. Application name is `docker_bs_<app>-automation-android` or `docker_bs_<app>-automation-ios-device`. `python -u`, not debugpy. `SKIP_BACKEND` and `SKIP_DATABASE` are `1` unless `BACKEND_INSTANCE` is `online`.
+8. **Run the tests with docker compose.** From the instawork repo root. Application name is `docker_bs_<app>-automation-android` or `docker_bs_<app>-automation-ios-device`. `python -u`, not debugpy. `SKIP_BACKEND` and `SKIP_DATABASE` are `1` unless `BACKEND_INSTANCE` is `online`. On an Android run, add `@set_capability::interactiveDebugging=true` to every scenario that will open a device before launching. That tag is sent as the session capability `interactiveDebugging=true`. Do not add it for an iOS run.
 
 ```bash
 docker compose -p mobile -f e2e/mobile/docker-compose_qa.yml run --rm --pull never \
@@ -223,9 +223,10 @@ Follow Fast start steps 5 and 7. Do not read `BUILD_ID` out of `.env` and reuse 
   the app is uploaded to BrowserStack and run on their device cloud.
 - **Override `.env` `BEHAVE_ARGS`** if it contains `+D repeat=5` and you only want one pass; pass
   `--behave-args "+D test"` explicitly.
-- **Android interactive debugging needs an explicit capability tag.** Add
-  `@set_capability::interactiveDebugging=true` on the scenario you want to inspect (for example a
-  temporary `@wip` scenario) before launching Android BrowserStack debug runs.
+- **Android runs set interactive debugging.** Before an Android BrowserStack launch, add
+  `@set_capability::interactiveDebugging=true` on each scenario that will open a device. The tag is
+  read in `before_scenario` and sent as `interactiveDebugging=true`. Do not add it for iOS. A Feature-level
+  tag applies to every scenario in that file, including ones this run skips.
 - **`mobile/.env` holds secrets** (BrowserStack key, TestOps token). It is gitignored; never paste
   or commit its values.
 - **Apple Silicon: pin `browserstack-local` to >= 1.2.3.** v1.2.2 hardcodes `BrowserStackLocal-linux-x64`
